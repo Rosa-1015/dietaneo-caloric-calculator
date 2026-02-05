@@ -23,7 +23,7 @@ python main.py
 ```
 
 ## 🛠️ Built With
-Python 3.13
+Python 3.13<br>
 Git & GitHub
 
 ## 📄 License
