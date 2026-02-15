@@ -1,1 +1,21 @@
+# Virtual environments
+venv/
+ENV/
+.env/
+
+# Python cache and bytecode
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Editor and IDE temporaries (Nano, VS Code, etc.)
+*.save
+*.save.*
+.vscode/
+.idea/
+*.swp
+*.tmp
+
+# Operating system files
+.DS_Store
+Thumbs.db
