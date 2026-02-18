@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 # Importamos tus funciones de calculations.py
 from calculations import get_age_reduction, get_activity_factor, calculate_bmr, calculate_tdee
@@ -10,11 +10,18 @@ app = FastAPI(title="Dietaneo API")
 
 # --- MODELO DE DATOS ---
 class NutritionData(BaseModel):
-    gender: str = Field(..., pattern="^[HM]$") # Solo acepta 'H' o 'M'
+    gender: str = Field(..., pattern="^[HM]$") 
     weight: float = Field(..., gt=0)
     height: float = Field(..., gt=0)
     age: int = Field(..., gt=0, lt=120)
-    activity_level: int = Field(..., ge=1, le=5) # Niveles 1 al 5
+    activity_level: int = Field(..., ge=1, le=5) 
+
+    @field_validator('gender', mode='before')
+    @classmethod
+    def transform_gender_to_upper(cls, value: str):
+        if isinstance(value, str):
+            return value.upper()
+        return value
 
 # --- MANEJADOR DE ERRORES EN ESPAÑOL ---
 @app.exception_handler(RequestValidationError)
@@ -25,7 +32,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         tipo = error.get("type")
         campo = error.get("loc")[-1]
         
-        # Traducción de mensajes según el tipo de error de Pydantic
         if tipo == "missing":
             mensaje = f"El campo '{campo}' es obligatorio."
         elif tipo == "string_pattern_mismatch":
@@ -67,7 +73,7 @@ def home():
 
 @app.post("/calculate")
 def calculate(data: NutritionData):
-    # Aplicamos tu lógica paso a paso usando los datos validados
+    
     reduction = get_age_reduction(data.age)
     factor = get_activity_factor(data.activity_level)
     bmr = calculate_bmr(data.gender, data.weight, data.height, data.age)
