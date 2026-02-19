@@ -2,11 +2,25 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
+from fastapi.middleware.cors import CORSMiddleware
 
 # Importamos tus funciones de calculations.py
 from calculations import get_age_reduction, get_activity_factor, calculate_bmr, calculate_tdee
 
 app = FastAPI(title="Dietaneo API")
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(title="Dietaneo API")
+
+# Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Esto permite que cualquier web consulte tu API (luego podemos cerrarlo a solo tu web)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- MODELO DE DATOS ---
 class NutritionData(BaseModel):
