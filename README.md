@@ -1,24 +1,26 @@
 # 🍎 Dietaneo Caloric Calculator (Pro Version)
 
-A professional-grade caloric needs calculator based on the **Harris-Benedict formula**, refactored to follow **modular programming** principles and clean architecture.
+A professional-grade caloric needs calculator based on the **Harris-Benedict formula**, refactored to follow **modular programming** principles and clean architecture.Now fully **Dockerized** with **Redis** caching and automated quality checks.
 
 ## 📂 Project Structure
-The project is organized into specific modules to ensure scalability and maintainability:
+The project follows a modern Python layout to ensure scalability:
 
-* **`api.py`**: The primary entry point. Configures FastAPI, handles custom error messages in Spanish, and defines endpoints.
-* **`calculations.py`**: Core mathematical logic and nutritional calculation algorithms.
-* **`test.http`**: Configuration for rapid API testing within VS Code (REST Client).
-* **`requirements.txt`**: List of Python dependencies (FastAPI, Uvicorn, Pydantic).
-* **`main.py`**: Original CLI entry point (Legacy/Testing).
-* **`validations.py`**: Supplementary data validation functions.
-* **`LICENSE`**: Project licensing information (MIT).
-* **`.gitignore`**: Specifies files and directories to be ignored by Git (e.g., `venv/`, `__pycache__/`).
+* **`app/`**: Core application directory.
+    * **`api.py`**: FastAPI configuration, custom error handlers, and CORS setup.
+    * **`calculations.py`**: Core mathematical logic for nutritional algorithms.
+* **`docker-compose.yml`**: Orchestration for the Backend (FastAPI) and Cache (Redis) services.
+* **`Dockerfile`**: Container recipe for the Python environment.
+* **`.env`**: Environment variables (secrets and configuration).
+* **`test.http`**: Configuration for rapid API testing within VS Code.
+* **`requirements.txt`**: Project dependencies.
+* **`.ruff.toml`**: Configuration for the **Ruff** linter (code quality).
 
-## 🚀 Features
-* **Clean Architecture**: Logical separation between the API layer, data validation, and core calculations.
-* **Custom Error Handling**: API responses and validation errors are localized in **Spanish** for seamless frontend integration.
-* **FastAPI Powered**: High-performance asynchronous API with automatic documentation.
-* **Modular Logic**: Calculation factors (age reduction, activity level) are isolated for easy updates.
+## 🚀 Professional Features
+* **Dockerized Workflow**: Consistent environment across development and production using Docker Compose.
+* **Redis Integration**: High-performance caching layer for optimized responses.
+* **Clean Architecture**: Logical separation between the API layer and core calculation logic.
+* **Custom Error Handling**: Localized validation errors in **Spanish** for frontend-ready responses.
+* **Code Quality**: Pre-configured with **Ruff** to ensure PEP8 compliance and clean code.
 
 ## 💻 Local Development Setup
 
@@ -28,29 +30,32 @@ The project is organized into specific modules to ensure scalability and maintai
     cd dietaneo-calculator
     ```
 
-2.  **Set up the environment:**
+2.  **Run with Docker (Recommended):**
+    ```bash
+    docker compose up --build
+    ```
+    The API will be available at `http://localhost:8001`
+
+3.  **Manual Setup (Virtual Env):**
     ```powershell
-    # Windows
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+    python -m venv venv
     .\venv\Scripts\activate
-    ```
-
-3.  **Install dependencies:**
-    ```bash
     pip install -r requirements.txt
+    python -m uvicorn app.api:app --reload --port 8001
     ```
 
-4.  **Run API locally:**
-    ```bash
-    python -m uvicorn api:app --reload --port 8001
-    ```
+## 🔍 Code Quality & Testing
+Before pushing changes, ensure the code follows style guidelines:
 
-## 🌐 API Endpoints & Testing
-* **Documentation**: Once running, access `http://127.0.0.1:8001/docs` for interactive Swagger UI.
+```powershell
+python -m ruff check .
+```
+
+## 🌐 API Documentation
+* **Swagger UI**: Access `http://localhost:8001/docs` for interactive testing.
 * **Main Endpoint**: `POST /calculate`
-* **Testing**: Use the `test.http` file with the VS Code **REST Client** extension for local testing.
+* **Health Check**: `testGET /`
 
 ## 🌐 Deployment
-This project is designed to be deployed on cloud environments (such as Hetzner). 
-
-**Best Practice:** Changes should always be tested locally and pushed to GitHub before being pulled into the production server.
+This project is designed to be deployed on cloud environments (such as Hetzner/AWS). 
+**Workflow:** Test locally → `git push` → `ssh` to server → `git pull` → `docker compose up -d .` 
