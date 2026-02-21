@@ -4,25 +4,22 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 from fastapi.middleware.cors import CORSMiddleware
 
-# Importamos tus funciones de calculations.py
-from calculations import get_age_reduction, get_activity_factor, calculate_bmr, calculate_tdee
+# Import calculation functions from our local module
+from app.calculations import get_age_reduction, get_activity_factor, calculate_bmr, calculate_tdee
 
+# 1. Initialize the FastAPI app
 app = FastAPI(title="Dietaneo API")
 
-from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI(title="Dietaneo API")
-
-# Configuración de CORS
+# 2. CORS Configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Esto permite que cualquier web consulte tu API (luego podemos cerrarlo a solo tu web)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- MODELO DE DATOS ---
+# --- DATA MODELS ---
 class NutritionData(BaseModel):
     gender: str = Field(..., pattern="^[HM]$") 
     weight: float = Field(..., gt=0)
@@ -37,37 +34,37 @@ class NutritionData(BaseModel):
             return value.upper()
         return value
 
-# --- MANEJADOR DE ERRORES EN ESPAÑOL ---
+# --- ERROR HANDLER (Customized for Spanish users) ---
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    detalles_personalizados = []
+    custom_details = []
     
     for error in exc.errors():
-        tipo = error.get("type")
-        campo = error.get("loc")[-1]
+        error_type = error.get("type")
+        field = error.get("loc")[-1]
         
-        if tipo == "missing":
-            mensaje = f"El campo '{campo}' es obligatorio."
-        elif tipo == "string_pattern_mismatch":
-            mensaje = f"En el campo '{campo}' solo se permite 'H' para Hombre o 'M' para Mujer."
-        elif tipo == "greater_than":
-            limite = error.get("ctx", {}).get("gt")
-            mensaje = f"El valor de '{campo}' debe ser mayor que {limite}."
-        elif tipo == "less_than":
-            limite = error.get("ctx", {}).get("lt")
-            mensaje = f"El valor de '{campo}' debe ser menor que {limite}."
-        elif tipo == "greater_than_equal":
-            limite = error.get("ctx", {}).get("ge")
-            mensaje = f"El valor de '{campo}' debe ser como mínimo {limite}."
-        elif tipo == "less_than_equal":
-            limite = error.get("ctx", {}).get("le")
-            mensaje = f"El valor de '{campo}' debe ser como máximo {limite}."
+        if error_type == "missing":
+            message = f"El campo '{field}' es obligatorio."
+        elif error_type == "string_pattern_mismatch":
+            message = f"En el campo '{field}' solo se permite 'H' para Hombre o 'M' para Mujer."
+        elif error_type == "greater_than":
+            limit = error.get("ctx", {}).get("gt")
+            message = f"El valor de '{field}' debe ser mayor que {limit}."
+        elif error_type == "less_than":
+            limit = error.get("ctx", {}).get("lt")
+            message = f"El valor de '{field}' debe ser menor que {limit}."
+        elif error_type == "greater_than_equal":
+            limit = error.get("ctx", {}).get("ge")
+            message = f"El valor de '{field}' debe ser como mínimo {limit}."
+        elif error_type == "less_than_equal":
+            limit = error.get("ctx", {}).get("le")
+            message = f"El valor de '{field}' debe ser como máximo {limit}."
         else:
-            mensaje = "El formato de este dato no es válido."
+            message = "El formato de este dato no es válido."
 
-        detalles_personalizados.append({
-            "campo": campo,
-            "mensaje": mensaje
+        custom_details.append({
+            "field": field,
+            "message": message
         })
 
     return JSONResponse(
@@ -75,7 +72,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={
             "status": "error",
             "message": "Datos de entrada inválidos",
-            "detalles": detalles_personalizados
+            "details": custom_details
         },
     )
 
@@ -87,7 +84,6 @@ def home():
 
 @app.post("/calculate")
 def calculate(data: NutritionData):
-    
     reduction = get_age_reduction(data.age)
     factor = get_activity_factor(data.activity_level)
     bmr = calculate_bmr(data.gender, data.weight, data.height, data.age)

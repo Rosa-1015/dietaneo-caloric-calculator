@@ -19,3 +19,10 @@ __pycache__/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Environment variables (Secrets)
+.env
+.env.local
+.env.development
+.env.test
+.env.production

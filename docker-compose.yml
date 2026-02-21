@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dietaneo-backend
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    networks:
+      - dietaneo-network
+    command: uvicorn app.api:app --host 0.0.0.0 --port 8001 --reload
+
+  redis:
+    image: redis:alpine
+    container_name: dietaneo-redis
+    networks:
+      - dietaneo-network
+
+networks:
+  dietaneo-network:
+    driver: bridge
