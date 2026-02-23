@@ -4,7 +4,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 from fastapi.middleware.cors import CORSMiddleware
 
-# Branch: develop - Laboratory for nutritional features
+# nutrition_calculator/api.py
+# Core logic for nutritional calculations and API endpoints
 
 # Import calculation functions from our local module
 from app.calculations import get_age_reduction, get_activity_factor, calculate_bmr, calculate_tdee
