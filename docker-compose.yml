@@ -1,27 +1,28 @@
 version: '3.8'
 
 services:
-  backend:
+  nutrition-api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: dietaneo-backend
+    container_name: nutrition-calculator-api
     ports:
       - "8001:8001"
     env_file:
       - .env
     depends_on:
-      - redis
+      - nutrition-redis
     networks:
-      - dietaneo-network
+      - nutrition-network
+    # Ensures Uvicorn listens on port 8001 for public access
     command: uvicorn app.api:app --host 0.0.0.0 --port 8001 --reload
 
-  redis:
+  nutrition-redis:
     image: redis:alpine
-    container_name: dietaneo-redis
+    container_name: nutrition-calculator-redis
     networks:
-      - dietaneo-network
+      - nutrition-network
 
 networks:
-  dietaneo-network:
+  nutrition-network:
     driver: bridge
