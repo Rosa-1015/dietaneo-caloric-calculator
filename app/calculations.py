@@ -1,5 +1,7 @@
+# --- FUNCIONES DE APOYO (Helpers) ---
+
 def get_age_reduction(age):
-    if age < 40 :
+    if age < 40:
         reduction = 0
     elif age < 50:
         reduction = 100
@@ -25,15 +27,40 @@ def get_activity_factor(activity):
             factor = 1.725
         case 5:
             factor = 1.9
+        case _:
+            factor = 1.2  # Valor por defecto por seguridad
     return factor
+
+# --- NUEVA FUNCIÓN: PESO CORREGIDO PARA OBESIDAD ---
+
+def get_adjusted_weight(weight, height):
+    """
+    Calcula el IMC y, si es >= 30, devuelve el Peso Corregido (PC).
+    Si no, devuelve el Peso Real (PR).
+    """
+    height_m = height / 100
+    imc = weight / (height_m ** 2)
+
+    if imc >= 30:
+        # PI = 22 * talla^2
+        pi = 22 * (height_m ** 2)
+        # PC = PI + 0.25 * (PR - PI)
+        pc = pi + 0.25 * (weight - pi)
+        return round(pc, 2)
+    
+    return weight
+
+# --- FÓRMULAS PRINCIPALES ---
 
 def calculate_bmr(gender, weight, height, age):
     if gender == "H":
         bmr = (66 + (13.7 * weight) + (5 * height) - (6.8 * age))
     elif gender == "M":
         bmr = (655 + (9.6 * weight) + (1.8 * height) - (4.7 * age))
+    else:
+        bmr = 0
     return bmr
 
 def calculate_tdee(bmr, factor, reduction):
-    tdee = bmr * factor - reduction
+    tdee = (bmr * factor) - reduction
     return tdee
