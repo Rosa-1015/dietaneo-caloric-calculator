@@ -122,5 +122,8 @@ def calculate(data: NutritionData):
             "kcal_actividad": round(bmr * (factor - 1), 2),
             "reduccion_edad": reduction,
             "total_calorias_diarias": round(tdee, 2),
+            # --- NUEVOS CAMPOS DE AVISO ---
+            "aviso_legal": "Esta estimación es orientativa y no sustituye la valoración individualizada de un profesional cualificado en nutrición.",
+            "recomendacion": "Para personalizar tu plan y asegurar una ingesta adecuada, consulta con un dietista.",
             "estado": "success"
     }
