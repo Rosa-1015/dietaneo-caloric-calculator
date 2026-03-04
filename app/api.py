@@ -3,9 +3,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Union
 
 # Import calculation functions from our local module
-# Añadimos get_adjusted_weight para la nueva lógica de obesidad
 from app.calculations import (
     get_age_reduction, 
     get_activity_factor, 
@@ -17,7 +17,7 @@ from app.calculations import (
 # 1. Initialize the FastAPI app
 app = FastAPI(title="Dietaneo API")
 
-# 2. CORS Configuration para permitir peticiones desde el frontend de WordPress
+# 2. CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,13 +28,21 @@ app.add_middleware(
 
 # --- DATA MODELS ---
 class NutritionData(BaseModel):
-    # IMPORTANTE: Usamos validation_alias para que WordPress envíe los datos en español
-    # pero internamente la lógica de Python siga usando nombres estándar en inglés
     gender: str = Field(..., pattern="^[HM]$", validation_alias="sexo") 
-    weight: float = Field(..., gt=0, validation_alias="peso")
-    height: float = Field(..., gt=0, validation_alias="altura")
+    weight: Union[int, float, str] = Field(..., validation_alias="peso") # Acepta cualquier formato inicial
+    height: Union[int, float, str] = Field(..., validation_alias="altura")
     age: int = Field(..., gt=0, lt=120, validation_alias="edad")
     activity_level: int = Field(..., ge=1, le=5, validation_alias="nivel_actividad") 
+
+    @field_validator('weight', 'height', mode='before')
+    @classmethod
+    def clean_numeric_fields(cls, value):
+        if isinstance(value, str):
+            value = value.replace(',', '.')  # Cambia coma por punto
+        try:
+            return int(float(value)) # Convierte a float y luego a entero (ej: 80.5 -> 80)
+        except (ValueError, TypeError):
+            raise ValueError("Debe ser un número válido")
 
     @field_validator('gender', mode='before')
     @classmethod
@@ -44,22 +52,19 @@ class NutritionData(BaseModel):
         return value
 
 # --- ERROR HANDLER ---
-# Personalizamos las respuestas de error para que el usuario de la web reciba mensajes claros en español
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     custom_details = []
     
     for error in exc.errors():
         error_type = error.get("type")
-        # 'loc' contendrá el alias (ej: 'peso') gracias a la configuración del modelo
         field = error.get("loc")[-1]
         
-        # --- NUEVA LÓGICA PARA ERRORES DE FORMATO ---
-        # Detecta cuando se introducen letras en campos numéricos
-        if error_type in ["float_parsing", "int_parsing"]:
+        # Detecta cuando se introducen decimales donde ahora pedimos enteros
+        if error_type == "int_parsing":
+            message = f"El campo '{field}' debe ser un número entero sin decimales."
+        elif error_type == "float_parsing":
             message = f"El campo '{field}' debe ser un número, no puede contener letras."
-        
-        # --- TRADUCCIÓN DE VALIDACIONES EXISTENTES ---
         elif error_type == "missing":
             message = f"El campo '{field}' es obligatorio."
         elif error_type == "string_pattern_mismatch":
@@ -97,32 +102,38 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.get("/")
 def home():
-    return {"message": "Dietaneo API - Harris-Benedict Logic"}
+    return {"message": "Dietaneo API - Harris-Benedict Logic con Criterio Clínico"}
 
 @app.post("/calculate")
 def calculate(data: NutritionData):
-    # --- LÓGICA DE PESO CORREGIDO ---
-    # 1. Calculamos el peso efectivo (ajustado por obesidad si IMC >= 30)
-    # Internamente mantenemos el código en inglés por estándar profesional (effective_weight)
+    # 1. LÓGICA DE PESO CORREGIDO
     effective_weight = get_adjusted_weight(data.weight, data.height)
 
-    # 2. Cálculos metabólicos principales
-    # IMPORTANTE: Internamente seguimos usando los nombres en inglés (data.age, etc.)
-    # Pero ahora pasamos el 'effective_weight' a la fórmula del BMR en lugar del peso real directo
+    # 2. Cálculos metabólicos
     reduction = get_age_reduction(data.age)
     factor = get_activity_factor(data.activity_level)
     bmr = calculate_bmr(data.gender, effective_weight, data.height, data.age)
     tdee = calculate_tdee(bmr, factor, reduction)
     
-    # 3. Respuesta final formateada en castellano para la integración con WordPress
+    # 3. LÓGICA DE SUPLEMENTACIÓN (Nueva mejora)
+    # Solo si el peso fue corregido Y las calorías finales son < 1800
+    is_weight_corrected = effective_weight < data.weight
+    needs_supplementation = is_weight_corrected and tdee < 1800
+
+    supplement_warning = ""
+    if needs_supplementation:
+        supplement_warning = "Nota: Al ser una pauta hipocalórica con ajuste metabólico por debajo de 1800 kcal, se recomienda valorar suplementación de micronutrientes."
+
+    # 4. Respuesta final
     return {
             "encabezado": "RESULTADO PARA DIETANEO",
-            "peso_utilizado_kg": effective_weight, # Mostramos qué peso se usó para transparencia clínica
+            "peso_utilizado_kg": round(effective_weight, 2),
             "calorias_en_reposo": round(bmr, 2),
             "kcal_actividad": round(bmr * (factor - 1), 2),
             "reduccion_edad": reduction,
             "total_calorias_diarias": round(tdee, 2),
-            # --- NUEVOS CAMPOS DE AVISO ---
+            "suplementacion_requerida": needs_supplementation,
+            "aviso_suplementacion": supplement_warning,
             "aviso_legal": "Esta estimación es orientativa y no sustituye la valoración individualizada de un profesional cualificado en nutrición.",
             "recomendacion": "Para personalizar tu plan y asegurar una ingesta adecuada, consulta con un dietista.",
             "estado": "success"
