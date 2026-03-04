@@ -28,9 +28,10 @@ app.add_middleware(
 
 # --- DATA MODELS ---
 class NutritionData(BaseModel):
+    # Usamos Union para ser flexibles en la entrada
     gender: str = Field(..., pattern="^[HM]$", validation_alias="sexo") 
-    weight: Union[int, float, str] = Field(..., validation_alias="peso") # Acepta cualquier formato inicial
-    height: Union[int, float, str] = Field(..., validation_alias="altura")
+    weight: Union[float, int, str] = Field(..., validation_alias="peso")
+    height: Union[float, int, str] = Field(..., validation_alias="altura")
     age: int = Field(..., gt=0, lt=120, validation_alias="edad")
     activity_level: int = Field(..., ge=1, le=5, validation_alias="nivel_actividad") 
 
@@ -38,9 +39,13 @@ class NutritionData(BaseModel):
     @classmethod
     def clean_numeric_fields(cls, value):
         if isinstance(value, str):
-            value = value.replace(',', '.')  # Cambia coma por punto
+            # Limpiamos la coma por el punto
+            value = value.replace(',', '.')
         try:
-            return int(float(value)) # Convierte a float y luego a entero (ej: 80.5 -> 80)
+            # Convertimos a float (ej: "80,5" -> 80.5)
+            # Esto evita el error de "Internal Server Error" porque el motor de cálculo
+            # de Harris-Benedict prefiere decimales para ser preciso.
+            return float(value)
         except (ValueError, TypeError):
             raise ValueError("Debe ser un número válido")
 
