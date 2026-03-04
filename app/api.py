@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Union, Any
+from typing import Union
 
 # Import calculation functions from our local module
 from app.calculations import (
