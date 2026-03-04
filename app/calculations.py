@@ -37,14 +37,26 @@ def get_adjusted_weight(weight, height):
     """
     Calcula el IMC y, si es >= 30, devuelve el Peso Corregido (PC).
     Si no, devuelve el Peso Real (PR).
+    Blindado contra errores de tipo de dato.
     """
+    # 1. Aseguramos que los valores sean numéricos para evitar Internal Server Error
+    weight = float(weight)
+    height = float(height)
+    
+    # 2. Convertimos altura a metros
     height_m = height / 100
+
+    # 3. Calculamos IMC
+    if height_m <= 0:  # Seguridad extra para evitar división por cero
+        return weight
+        
     imc = weight / (height_m ** 2)
 
+    # 4. Lógica de corrección por obesidad
     if imc >= 30:
-        # PI = 22 * talla^2
+        # Peso Ideal (PI) = 22 * talla^2
         pi = 22 * (height_m ** 2)
-        # PC = PI + 0.25 * (PR - PI)
+        # Peso Corregido (PC) = PI + 0.25 * (PR - PI)
         pc = pi + 0.25 * (weight - pi)
         return round(pc, 2)
     
