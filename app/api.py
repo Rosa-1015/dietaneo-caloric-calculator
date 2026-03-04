@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Union
 
@@ -27,63 +27,28 @@ app.add_middleware(
 )
 
 # --- DATA MODELS ---
+# Hemos simplificado el modelo para que no valide tipos estrictos
+# Así los datos llegan a 'calculate' y tú decides qué mensaje dar.
 class NutritionData(BaseModel):
-    gender: str = Field(..., pattern="^[HM]$", validation_alias="sexo") 
+    gender: str = Field(..., validation_alias="sexo") 
     weight: Union[str, float, int] = Field(..., validation_alias="peso") 
     height: Union[str, float, int] = Field(..., validation_alias="altura") 
-    age: int = Field(..., gt=0, lt=120, validation_alias="edad")
+    age: Union[str, int] = Field(..., validation_alias="edad")
     activity_level: Union[str, float, int] = Field(..., validation_alias="nivel_actividad")
 
-    @field_validator('weight', 'height', mode='before')
-    @classmethod
-    def clean_numeric_fields(cls, value):
-        if isinstance(value, str):
-            value = value.replace(',', '.')
-        try:
-            return float(value)
-        except (ValueError, TypeError):
-            raise ValueError("Debe ser un número válido")
-
-    @field_validator('gender', mode='before')
-    @classmethod
-    def transform_gender_to_upper(cls, value: str):
-        if isinstance(value, str):
-            return value.upper()
-        return value
-
-# --- ERROR HANDLER ---
+# --- ERROR HANDLER (Para campos obligatorios o sexo mal puesto) ---
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     custom_details = []
     for error in exc.errors():
-        error_type = error.get("type")
         field = error.get("loc")[-1]
+        error_type = error.get("type")
         
-        if error_type == "int_parsing":
-            message = f"El campo '{field}' debe ser un número entero (1, 2, 3, 4 o 5) sin decimales."
-        elif error_type in ["greater_than_equal", "ge", "less_than_equal", "le"]:
-            message = f"El nivel de actividad debe ser un número entero entre 1 y 5."
-        elif error_type == "float_parsing" or "value_error" in error_type:
-            message = f"El campo '{field}' debe ser un número válido (puedes usar coma o punto)."
-        elif error_type == "missing":
+        if error_type == "missing":
             message = f"El campo '{field}' es obligatorio."
-        elif error_type == "string_pattern_mismatch":
-            message = f"En el campo '{field}' solo se permite 'H' (Hombre) o 'M' (Mujer)."
-        elif error_type in ["greater_than", "gt"]:
-            limit = error.get("ctx", {}).get("gt")
-            message = f"El valor de '{field}' debe ser mayor que {limit}."
-        elif error_type in ["less_than", "lt"]:
-            limit = error.get("ctx", {}).get("lt")
-            message = f"El valor de '{field}' debe ser menor que {limit}."
-        elif error_type in ["greater_than_equal", "ge"]:
-            limit = error.get("ctx", {}).get("ge")
-            message = f"El valor de '{field}' debe ser como mínimo {limit}."
-        elif error_type in ["less_than_equal", "le"]:
-            limit = error.get("ctx", {}).get("le")
-            message = f"El valor de '{field}' debe ser como máximo {limit}."
         else:
-            message = f"Formato no válido para '{field}'."
-
+            message = f"Asegúrate de introducir un valor válido en '{field}'."
+        
         custom_details.append({"field": field, "message": message})
 
     return JSONResponse(
@@ -98,33 +63,48 @@ def home():
     return {"message": "Dietaneo API - Harris-Benedict Logic con Criterio Clínico"}
 
 @app.post("/calculate")
-@app.post("/calculate")
-@app.post("/calculate")
 def calculate(data: NutritionData):
     # 1. LIMPIEZA Y CONVERSIÓN MANUAL (Blindada)
     try:
-        # Forzamos conversión a string para manejar el reemplazo de comas
+        # Normalizamos sexo a mayúsculas
+        sexo_v = str(data.gender).upper()
+        if sexo_v not in ["H", "M"]:
+            return {
+                "status": "error",
+                "message": "En el campo 'sexo' solo se permite 'H' (Hombre) o 'M' (Mujer)."
+            }
+
+        # Forzamos conversión a string para manejar comas y campos vacíos
         peso_v = float(str(data.weight).replace(',', '.'))
         altura_v = float(str(data.height).replace(',', '.'))
-        edad_v = int(data.age)
+        
+        # Edad: la tratamos como string primero para limpiar posibles espacios
+        edad_raw = str(data.age).strip()
+        if not edad_raw:
+            return {
+                "status": "error",
+                "message": "El campo 'edad' no puede estar vacío."
+            }
+        edad_v = int(edad_raw)
         
         # Actividad: Normalizamos para verificar si es entero
         actividad_raw = str(data.activity_level).replace(',', '.')
+        actividad_f = float(actividad_raw)
         
-        # Bloqueo si hay decimales en actividad (ej: 1.2 o 1,2)
-        if float(actividad_raw) != float(int(float(actividad_raw))):
+        # Bloqueo si hay decimales en actividad (ej: 1.2)
+        if actividad_f != float(int(actividad_f)):
             return {
                 "status": "error",
                 "encabezado": "ACTIVIDAD SIN DECIMALES",
                 "message": "El nivel de actividad debe ser un número entero (1, 2, 3, 4 o 5). No se permiten decimales."
             }
         
-        actividad_v = int(float(actividad_raw))
+        actividad_v = int(actividad_f)
 
     except (ValueError, TypeError):
         return {
             "status": "error",
-            "message": "Asegúrate de introducir valores numéricos válidos en peso, altura y actividad."
+            "message": "Asegúrate de introducir valores numéricos válidos en peso, altura, edad y actividad (puedes usar coma o punto)."
         }
 
     # 2. BLOQUEO DE SEGURIDAD (Edad)
@@ -150,7 +130,7 @@ def calculate(data: NutritionData):
     reduction = get_age_reduction(edad_v)
     factor_final = get_activity_factor(actividad_v)
     
-    bmr = calculate_bmr(data.gender, effective_weight, altura_v, edad_v)
+    bmr = calculate_bmr(sexo_v, effective_weight, altura_v, edad_v)
     tdee = calculate_tdee(bmr, factor_final, reduction)
     
     # 5. LÓGICA DE SUPLEMENTACIÓN
