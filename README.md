@@ -1,13 +1,13 @@
 # 🍎 Dietaneo Caloric Calculator (Pro Version)
 
-A professional-grade caloric needs calculator based on the **Harris-Benedict formula**, refactored to follow **modular programming** principles and clean architecture.Now fully **Dockerized** with **Redis** caching and automated quality checks.
+A professional-grade caloric needs calculator based on the **Harris-Benedict formula**, refactored to follow **modular programming** principles and clean architecture. Now fully **Dockerized** with **Redis** caching and advanced clinical validation logic.
 
 ## 📂 Project Structure
 The project follows a modern Python layout to ensure scalability:
 
 * **`app/`**: Core application directory.
-    * **`api.py`**: FastAPI configuration, custom error handlers, and CORS setup.
-    * **`calculations.py`**: Core mathematical logic for nutritional algorithms.
+    * **`api.py`**: FastAPI configuration, **custom human-readable error handlers**, and CORS setup.
+    * **`calculations.py`**: Core mathematical logic, including **BMI-based weight correction (IMC 24.9)** and age-related metabolism reduction.
 * **`docker-compose.yml`**: Orchestration for the Backend (FastAPI) and Cache (Redis) services.
 * **`Dockerfile`**: Container recipe for the Python environment.
 * **`.env`**: Environment variables (secrets and configuration).
@@ -16,10 +16,12 @@ The project follows a modern Python layout to ensure scalability:
 * **`.ruff.toml`**: Configuration for the **Ruff** linter (code quality).
 
 ## 🚀 Professional Features
+* **Humanized Validation**: Custom error handling that accepts both dots and commas (`,`, `.`) for decimal inputs, providing clear Spanish messages for the frontend.
+* **Clinical Weight Correction**: Automatically applies the **Adjusted Weight formula** for users with **BMI ≥ 30**, using an **Ideal BMI of 24.9** to prevent caloric overestimation in obesity cases.
+* **Metabolic Age Adjustment**: Dynamic caloric reduction based on the user's decade (from 40 to 80+ years).
 * **Dockerized Workflow**: Consistent environment across development and production using Docker Compose.
 * **Redis Integration**: High-performance caching layer for optimized responses.
 * **Clean Architecture**: Logical separation between the API layer and core calculation logic.
-* **Custom Error Handling**: Localized validation errors in **Spanish** for frontend-ready responses.
 * **Code Quality**: Pre-configured with **Ruff** to ensure PEP8 compliance and clean code.
 
 ## 💻 Local Development Setup
@@ -52,10 +54,20 @@ python -m ruff check .
 ```
 
 ## 🌐 API Documentation
+
 * **Swagger UI**: Access `http://localhost:8001/docs` for interactive testing.
 * **Main Endpoint**: `POST /calculate`
-* **Health Check**: `testGET /`
+* **Input Flexibility**: Accepts `string`, `int`, or `float` to handle various frontend formats.
+* **Health Check**: `GET /`
 
 ## 🌐 Deployment
+
 This project is designed to be deployed on cloud environments (such as Hetzner/AWS). 
-**Workflow:** Test locally → `git push` → `ssh` to server → `git pull` → `docker compose up -d .` 
+
+**Workflow:** Test locally → `git push` → `ssh` to server → `git pull`
+
+Ejecuta el siguiente comando para actualizar el servicio:
+
+```bash
+docker compose up --build -d
+```
