@@ -1,62 +1,58 @@
 # --- FUNCIONES DE APOYO (Helpers) ---
 
-def get_age_reduction(age):
+def get_age_reduction(age: int) -> int:
+    """
+    Calcula la reducción calórica metabólica según la década de edad.
+    """
     if age < 40:
-        reduction = 0
+        return 0
     elif age < 50:
-        reduction = 100
+        return 100
     elif age < 60:
-        reduction = 200
+        return 200
     elif age < 70:
-        reduction = 300 
+        return 300 
     elif age < 80:
-        reduction = 400
+        return 400
     else:
-        reduction = 500
-    return reduction
+        return 500
 
-def get_activity_factor(activity):
-    match activity:
-        case 1:
-            factor = 1.2
-        case 2:
-            factor = 1.375
-        case 3:
-            factor = 1.55
-        case 4:
-            factor = 1.725
-        case 5:
-            factor = 1.9
-        case _:
-            factor = 1.2  # Valor por defecto por seguridad
-    return factor
-
-# --- NUEVA FUNCIÓN: PESO CORREGIDO PARA OBESIDAD ---
-
-def get_adjusted_weight(weight, height):
+def get_activity_factor(activity: int) -> float:
     """
-    Calcula el IMC y, si es >= 30, devuelve el Peso Corregido (PC).
-    Si no, devuelve el Peso Real (PR).
-    Blindado contra errores de tipo de dato.
+    Asocia el nivel de actividad entero con su factor multiplicador Harris-Benedict.
     """
-    # 1. Aseguramos que los valores sean numéricos para evitar Internal Server Error
-    weight = float(weight)
-    height = float(height)
-    
-    # 2. Convertimos altura a metros
-    height_m = height / 100
+    factors = {
+        1: 1.2,    # Sedentario
+        2: 1.375,  # Ligero
+        3: 1.55,   # Moderado
+        4: 1.725,  # Fuerte
+        5: 1.9     # Muy fuerte
+    }
+    return factors.get(activity, 1.2) # 1.2 por defecto si algo falla
 
-    # 3. Calculamos IMC
-    if height_m <= 0:  # Seguridad extra para evitar división por cero
+# --- PESO CORREGIDO PARA OBESIDAD (Ajustado a IMC 24.9) ---
+
+def get_adjusted_weight(weight: float, height: float) -> float:
+    """
+    Aplica la fórmula de Peso Corregido (PC) para pacientes con IMC >= 30.
+    Utiliza el IMC de 24.9 (límite superior de normopeso) para el Peso Ideal (PI).
+    """
+    # 1. Seguridad: Evitar alturas absurdas o cero
+    if height <= 50: 
         return weight
         
+    # 2. Convertimos altura a metros y calculamos IMC
+    height_m = height / 100
     imc = weight / (height_m ** 2)
 
-    # 4. Lógica de corrección por obesidad
+    # 3. Lógica de corrección (Solo si hay obesidad IMC >= 30)
     if imc >= 30:
-        # Peso Ideal (PI) = 22 * talla^2
-        pi = 22 * (height_m ** 2)
-        # Peso Corregido (PC) = PI + 0.25 * (PR - PI)
+        # Peso Ideal (PI) usando el límite superior saludable (IMC 24.9)
+        # PI = 24.9 * talla(m)^2
+        pi = 24.9 * (height_m ** 2)
+        
+        # Peso Corregido (PC) = PI + 0.25 * (Peso Real - PI)
+        # El 0.25 representa el gasto metabólico del tejido graso
         pc = pi + 0.25 * (weight - pi)
         return round(pc, 2)
     
@@ -64,15 +60,19 @@ def get_adjusted_weight(weight, height):
 
 # --- FÓRMULAS PRINCIPALES ---
 
-def calculate_bmr(gender, weight, height, age):
+def calculate_bmr(gender: str, weight: float, height: float, age: int) -> float:
+    """
+    Fórmula de Harris-Benedict original revisada (Roza & Shizgal).
+    """
     if gender == "H":
-        bmr = (66 + (13.7 * weight) + (5 * height) - (6.8 * age))
+        return (66.47 + (13.75 * weight) + (5.0 * height) - (6.75 * age))
     elif gender == "M":
-        bmr = (655 + (9.6 * weight) + (1.8 * height) - (4.7 * age))
-    else:
-        bmr = 0
-    return bmr
+        return (655.1 + (9.56 * weight) + (1.85 * height) - (4.68 * age))
+    return 0.0
 
-def calculate_tdee(bmr, factor, reduction):
-    tdee = (bmr * factor) - reduction
-    return tdee
+def calculate_tdee(bmr: float, factor: float, reduction: int) -> float:
+    """
+    Cálculo del Gasto Energético Total (TDEE) ajustado por factor de actividad
+    y reducción metabólica por edad.
+    """
+    return (bmr * factor) - reduction

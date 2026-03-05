@@ -14,10 +14,8 @@ from app.calculations import (
     get_adjusted_weight
 )
 
-# 1. Initialize the FastAPI app
 app = FastAPI(title="Dietaneo API")
 
-# 2. CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,16 +25,15 @@ app.add_middleware(
 )
 
 # --- DATA MODELS ---
-# Hemos simplificado el modelo para que no valide tipos estrictos
-# Así los datos llegan a 'calculate' y tú decides qué mensaje dar.
 class NutritionData(BaseModel):
     gender: str = Field(..., validation_alias="sexo") 
     weight: Union[str, float, int] = Field(..., validation_alias="peso") 
     height: Union[str, float, int] = Field(..., validation_alias="altura") 
     age: Union[str, int] = Field(..., validation_alias="edad")
-    activity_level: Union[str, float, int] = Field(..., validation_alias="nivel_actividad")
+    # Quitamos 'float' para no incentivar el uso de decimales en Swagger
+    activity_level: Union[str, int] = Field(..., validation_alias="nivel_actividad")
 
-# --- ERROR HANDLER (Para campos obligatorios o sexo mal puesto) ---
+# --- ERROR HANDLER ---
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     custom_details = []
@@ -46,8 +43,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         
         if error_type == "missing":
             message = f"El campo '{field}' es obligatorio."
+        elif field == "sexo":
+            message = "Solo se permite 'H' (Hombre) o 'M' (Mujer)."
         else:
-            message = f"Asegúrate de introducir un valor válido en '{field}'."
+            message = f"El valor en '{field}' no es válido."
         
         custom_details.append({"field": field, "message": message})
 
@@ -64,60 +63,53 @@ def home():
 
 @app.post("/calculate")
 def calculate(data: NutritionData):
-    # 1. LIMPIEZA Y CONVERSIÓN MANUAL (Blindada)
     try:
-        # Normalizamos sexo a mayúsculas
-        sexo_v = str(data.gender).upper()
+        # 1. GÉNERO
+        sexo_v = str(data.gender).upper().strip()
         if sexo_v not in ["H", "M"]:
-            return {
-                "status": "error",
-                "message": "En el campo 'sexo' solo se permite 'H' (Hombre) o 'M' (Mujer)."
-            }
+            return {"status": "error", "message": "En el campo 'sexo' solo se permite 'H' o 'M'."}
 
-        # Forzamos conversión a string para manejar comas y campos vacíos
+        # 2. PESO Y ALTURA (Aceptan coma)
         peso_v = float(str(data.weight).replace(',', '.'))
         altura_v = float(str(data.height).replace(',', '.'))
         
-        # Edad: la tratamos como string primero para limpiar posibles espacios
+        # 3. EDAD
         edad_raw = str(data.age).strip()
         if not edad_raw:
-            return {
-                "status": "error",
-                "message": "El campo 'edad' no puede estar vacío."
-            }
+            return {"status": "error", "message": "La edad no puede estar vacía."}
         edad_v = int(edad_raw)
         
-        # Actividad: Normalizamos para verificar si es entero
-        actividad_raw = str(data.activity_level).replace(',', '.')
-        actividad_f = float(actividad_raw)
+        # 4. ACTIVIDAD (Control total de texto y decimales)
+        act_raw = str(data.activity_level).replace(',', '.').strip()
         
-        # Bloqueo si hay decimales en actividad (ej: 1.2)
-        if actividad_f != float(int(actividad_f)):
+        if not act_raw:
+            return {"status": "error", "message": "El nivel de actividad es obligatorio."}
+
+        # Si escriben palabras o decimales (ej: "1.5" o "mucha")
+        if "." in act_raw:
             return {
                 "status": "error",
                 "encabezado": "ACTIVIDAD SIN DECIMALES",
-                "message": "El nivel de actividad debe ser un número entero (1, 2, 3, 4 o 5). No se permiten decimales."
+                "message": "El nivel de actividad debe ser un número entero (1, 2, 3, 4 o 5)."
             }
         
-        actividad_v = int(actividad_f)
+        # Si es una palabra, int() lanzará ValueError y saltará al except general
+        actividad_v = int(act_raw)
 
     except (ValueError, TypeError):
         return {
             "status": "error",
-            "message": "Asegúrate de introducir valores numéricos válidos en peso, altura, edad y actividad (puedes usar coma o punto)."
+            "message": "Asegúrate de introducir valores numéricos válidos en peso, altura, edad y actividad."
         }
 
-    # 2. BLOQUEO DE SEGURIDAD (Edad)
+    # --- VALIDACIONES DE RANGO ---
     if edad_v < 18:
         return {
             "status": "error",
             "encabezado": "EDAD NO VÁLIDA",
-            "message": "Esta calculadora está diseñada exclusivamente para adultos (18+ años).",
-            "suplementacion_requerida": False,
-            "total_calorias_diarias": 0
+            "message": "Esta calculadora está diseñada exclusivamente para adultos (18+ años)."
         }
     
-    # 3. VALIDACIÓN DE RANGO (Actividad 1-5)
     if actividad_v < 1 or actividad_v > 5:
         return {
             "status": "error",
@@ -125,7 +117,7 @@ def calculate(data: NutritionData):
             "message": "El nivel de actividad debe ser exactamente 1, 2, 3, 4 o 5."
         }
 
-    # 4. LÓGICA DE NEGOCIO
+    # --- LÓGICA DE NEGOCIO ---
     effective_weight = get_adjusted_weight(peso_v, altura_v)
     reduction = get_age_reduction(edad_v)
     factor_final = get_activity_factor(actividad_v)
@@ -133,7 +125,6 @@ def calculate(data: NutritionData):
     bmr = calculate_bmr(sexo_v, effective_weight, altura_v, edad_v)
     tdee = calculate_tdee(bmr, factor_final, reduction)
     
-    # 5. LÓGICA DE SUPLEMENTACIÓN
     is_weight_corrected = effective_weight < peso_v
     needs_supplementation = is_weight_corrected and tdee < 1800
 
@@ -141,7 +132,6 @@ def calculate(data: NutritionData):
     if needs_supplementation:
         supplement_warning = "Nota: Al ser una pauta hipocalórica con ajuste metabólico por debajo de 1800 kcal, se recomienda valorar suplementación de micronutrientes."
 
-    # 6. Respuesta final
     return {
             "encabezado": "RESULTADO PARA DIETANEO",
             "peso_utilizado_kg": round(effective_weight, 2),
