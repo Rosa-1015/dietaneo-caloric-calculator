@@ -8,12 +8,18 @@ The project follows a modern Python layout to ensure scalability:
 * **`app/`**: Core application directory.
     * **`api.py`**: FastAPI configuration, **custom human-readable error handlers**, and CORS setup.
     * **`calculations.py`**: Core mathematical logic, including **BMI-based weight correction (IMC 24.9)** and age-related metabolism reduction.
+    * **`validations.py`**: Validation utilities and helpers.
+    * **`main.py`**: Alternative API configuration (legacy).
+* **`test/`**: Unit tests directory (pytest-based).
+* **`docs/`**: Developer documentation.
+    * **`README.md`**: Documentation index for developers.
+    * **`TESTING.md`**: Complete testing guide and best practices.
 * **`docker-compose.yml`**: Orchestration for the Backend (FastAPI) and Cache (Redis) services.
 * **`Dockerfile`**: Container recipe for the Python environment.
 * **`.env`**: Environment variables (secrets and configuration).
 * **`test.http`**: Configuration for rapid API testing within VS Code.
 * **`requirements.txt`**: Project dependencies.
-* **`.ruff.toml`**: Configuration for the **Ruff** linter (code quality).
+* **`CLAUDE.md`**: Architecture and development guidelines.
 
 ## 🚀 Professional Features
 * **Humanized Validation**: Custom error handling that accepts both dots and commas (`,`, `.`) for decimal inputs, providing clear Spanish messages for the frontend.
@@ -52,6 +58,15 @@ Before pushing changes, ensure the code follows style guidelines:
 ```powershell
 python -m ruff check .
 ```
+
+## 👨‍💻 For Developers
+
+For detailed guides on testing, architecture, and development workflows, see the [Developer Documentation](docs/README.md).
+
+Quick links:
+- **[Testing Guide](docs/TESTING.md)** - Complete unit testing guide (pytest, FastAPI)
+- **[CLAUDE.md](CLAUDE.md)** - Architecture & development setup
+- **[API Documentation](#-api-documentation)** - Endpoint details below
 
 ## 🌐 API Documentation
 
