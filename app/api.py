@@ -117,6 +117,13 @@ def calculate(data: NutritionData):
             "message": "El nivel de actividad debe ser exactamente 1, 2, 3, 4 o 5."
         }
 
+    if peso_v <= 0:
+        return {
+            "status": "error",
+            "encabezado": "PESO INVÁLIDO",
+            "message": "El peso debe ser un valor positivo mayor a cero."
+        }
+
     # --- LÓGICA DE NEGOCIO ---
     effective_weight = get_adjusted_weight(peso_v, altura_v)
     reduction = get_age_reduction(edad_v)
