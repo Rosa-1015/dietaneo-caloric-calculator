@@ -19,6 +19,21 @@ Contents:
 
 **Read if**: You need to understand how to write tests or you're assigned testing tasks.
 
+### [GITHUB_ACTIONS.md](GITHUB_ACTIONS.md)
+**GitHub Actions & CI/CD Guide** (Beginner-friendly, mentor-style)
+
+Contents:
+- What is CI/CD?
+- GitHub Actions workflow explanation
+- Line-by-line breakdown of tests.yml
+- How triggers and jobs work
+- Viewing results and logs
+- Practical examples
+- Common errors & solutions
+- Future optimizations
+
+**Read if**: You want to understand how automated testing works or need to configure CI/CD.
+
 ### [../CLAUDE.md](../CLAUDE.md)
 **Architecture & Development Setup**
 
