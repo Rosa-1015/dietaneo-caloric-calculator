@@ -1,11 +1,11 @@
 # 📚 Developer Documentation
 
-This folder contains guides and documentation for developers working on the Dietaneo project.
+This folder contains guides and comprehensive documentation for developers working on the Dietaneo project.
 
 ## 📄 Available Guides
 
 ### [TESTING.md](TESTING.md)
-**Complete Testing Guide** (Beginner-friendly, mentor-style)
+**Complete Testing Guide**
 
 Contents:
 - Why testing matters
@@ -20,7 +20,7 @@ Contents:
 **Read if**: You need to understand how to write tests or you're assigned testing tasks.
 
 ### [GITHUB_ACTIONS.md](GITHUB_ACTIONS.md)
-**GitHub Actions & CI/CD Guide** (Beginner-friendly, mentor-style)
+**GitHub Actions & CI/CD Guide**
 
 Contents:
 - What is CI/CD?
@@ -44,11 +44,14 @@ Contents:
 - Calculation pipeline
 - Important implementation details
 
-## 📖 Quick Start
+---
+
+## 🚀 Quick Start
 
 **New to the project?**
 1. Read [../CLAUDE.md](../CLAUDE.md) - Understand the architecture
 2. Read [TESTING.md](TESTING.md) - Learn how to write tests
+3. Read [GITHUB_ACTIONS.md](GITHUB_ACTIONS.md) - Understand CI/CD automation
 
 **Ready to contribute?**
 ```bash

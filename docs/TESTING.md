@@ -1,146 +1,146 @@
-# 🧪 Guía Completa de Testing para Dietaneo
+# 🧪 Complete Testing Guide for Dietaneo
 
-*Escrito como mentoring senior para desarrolladores en nivel básico*
+*Comprehensive testing documentation for the Dietaneo caloric calculator*
 
 ---
 
-## 📚 Tabla de Contenidos
-1. [¿Por qué Testing?](#por-qué-testing)
-2. [Conceptos Fundamentales](#conceptos-fundamentales)
-3. [Estructura del Proyecto](#estructura-del-proyecto)
-4. [Tu Primer Test](#tu-primer-test)
-5. [Tests de Cálculos](#tests-de-cálculos)
-6. [Tests de API](#tests-de-api)
-7. [Ejecutar Tests](#ejecutar-tests)
-8. [Buenas Prácticas](#buenas-prácticas)
+## 📚 Table of Contents
+1. [Why Testing?](#why-testing)
+2. [Fundamental Concepts](#fundamental-concepts)
+3. [Project Structure](#project-structure)
+4. [Your First Test](#your-first-test)
+5. [Calculation Tests](#calculation-tests)
+6. [API Tests](#api-tests)
+7. [Running Tests](#running-tests)
+8. [Best Practices](#best-practices)
 9. [Troubleshooting](#troubleshooting)
 
 ---
 
-## ¿Por qué Testing?
+## Why Testing?
 
-Imagina que eres un chef en un restaurante. ¿Enviarías un plato a los clientes sin probar primero que esté bien cocinado? **No, verdad.**
+Imagine you're a chef in a restaurant. Would you serve a dish to customers without tasting it first to make sure it's properly cooked? **Of course not.**
 
-Con el código pasa exactamente lo mismo. Los tests son como "probar el plato" antes de entregarlo. Te dan seguridad de que:
+The same applies to code. Tests are like "tasting the dish" before delivery. They give you confidence that:
 
-✅ Tu código hace lo que debería hacer
-✅ Los cambios futuros no rompen lo que ya funciona
-✅ Los errores se detectan rápido
-✅ Otros desarrolladores (o tú en 6 meses) confían en que el código funciona
+✅ Your code does exactly what it should do
+✅ Future changes don't break existing functionality
+✅ Errors are detected early
+✅ Other developers (or you in 6 months) trust that the code works
 
-En Dietaneo, por ejemplo, es **crítico** que los cálculos nutricionales sean exactos. Un pequeño error en la fórmula podría afectar la salud del usuario final.
+In Dietaneo, it's **critical** that nutritional calculations are accurate. A small error in the formula could affect the end user's health.
 
 ---
 
-## Conceptos Fundamentales
+## Fundamental Concepts
 
-### ¿Qué es un Test Unitario?
+### What is a Unit Test?
 
-Un **test unitario** prueba **una pequeña parte** de tu código en aislamiento.
+A **unit test** tests a **small part** of your code in isolation.
 
-Por ejemplo:
-- Un test para la función `get_age_reduction(35)` debe retornar `0`
-- Un test para `get_activity_factor(3)` debe retornar `1.55`
-- Un test para la corrección de peso con BMI ≥ 30
+For example:
+- A test for the function `get_age_reduction(35)` should return `0`
+- A test for `get_activity_factor(3)` should return `1.55`
+- A test for weight correction with BMI ≥ 30
 
-**No es** un test que pruebe todo el sistema junto. Eso se llama test de integración.
+It's **not** a test that tests the entire system together. That's called an integration test.
 
-### Estructura de un Test
+### Test Structure
 
-Todos los tests siguen el mismo patrón: **Arrange → Act → Assert**
+All tests follow the same pattern: **Arrange → Act → Assert**
 
 ```python
-# 1. ARRANGE (Preparar): Configura los datos necesarios
-edad = 45
+# 1. ARRANGE (Prepare): Set up the necessary data
+age = 45
 
-# 2. ACT (Actuar): Ejecuta la función que quieres probar
-resultado = get_age_reduction(edad)
+# 2. ACT (Execute): Run the function you want to test
+result = get_age_reduction(age)
 
-# 3. ASSERT (Afirmar): Verifica que el resultado sea el esperado
-assert resultado == 100  # Esperamos 100 kcal de reducción para edad 40-50
+# 3. ASSERT (Verify): Check that the result is what you expected
+assert result == 100  # We expect 100 kcal reduction for age 40-50
 ```
 
-**En código de test formal** se ve así:
+**In formal test code** it looks like this:
 
 ```python
 def test_age_reduction_40_to_50():
     # Arrange
-    edad = 45
+    age = 45
 
     # Act
-    resultado = get_age_reduction(edad)
+    result = get_age_reduction(age)
 
     # Assert
-    assert resultado == 100
+    assert result == 100
 ```
 
-### ¿Por qué "assert"?
+### Why "assert"?
 
-`assert` es una palabra clave de Python que significa "afirmo que esto es verdad".
+`assert` is a Python keyword that means "I affirm this is true".
 
-- Si es **verdad** → el test pasa ✅
-- Si es **falso** → el test falla ❌ y pytest te muestra qué salió mal
+- If it's **true** → the test passes ✅
+- If it's **false** → the test fails ❌ and pytest shows you what went wrong
 
-Ejemplo:
+Example:
 ```python
-assert 2 + 2 == 4  # PASA ✅
-assert 2 + 2 == 5  # FALLA ❌
+assert 2 + 2 == 4  # PASSES ✅
+assert 2 + 2 == 5  # FAILS ❌
 ```
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
-Actualmente tu carpeta `test/` está vacía. Aquí te muestro cómo organizarla:
+Currently your `test/` folder is empty. Here's how to organize it:
 
 ```
 nutrition_calculator/
 ├── app/
-│   ├── api.py                 # Endpoints FastAPI
-│   ├── calculations.py        # Funciones de cálculo
+│   ├── api.py                 # FastAPI endpoints
+│   ├── calculations.py        # Calculation functions
 │   ├── validations.py
 │   └── main.py
-├── test/                      # ← AQUÍ van tus tests
-│   ├── __init__.py           # Archivo vacío (le dice a Python que es un módulo)
-│   ├── test_calculations.py  # Tests para funciones puras
-│   └── test_api.py           # Tests para endpoints
-├── docs/                      # ← NUEVA carpeta para documentación
-│   └── TESTING.md            # Este archivo
+├── test/                      # ← YOUR TESTS GO HERE
+│   ├── __init__.py           # Empty file (tells Python this is a module)
+│   ├── test_calculations.py  # Tests for pure functions
+│   └── test_api.py           # Tests for endpoints
+├── docs/                      # ← DOCUMENTATION FOLDER
+│   └── TESTING.md            # This file
 ├── requirements.txt
 ├── docker-compose.yml
 └── CLAUDE.md
 ```
 
-**¿Por qué esta estructura?**
+**Why this structure?**
 
-- Mantiene tests separados del código de producción
-- Pytest automáticamente encuentra archivos que empiezan con `test_`
-- Es la convención estándar en la industria (todos en el equipo sabrán dónde buscar)
+- Keeps tests separate from production code
+- Pytest automatically finds files starting with `test_`
+- It's the industry standard convention (everyone on the team knows where to look)
 
 ---
 
-## Tu Primer Test
+## Your First Test
 
-### Paso 1: Crear la carpeta y archivo
+### Step 1: Create the folder and file
 
 ```bash
-# Desde la raíz del proyecto
+# From the project root
 touch test/__init__.py
 touch test/test_calculations.py
 ```
 
-`__init__.py` es un archivo especial en Python (puede estar vacío). Le dice a Python que esta carpeta es un módulo importable.
+`__init__.py` is a special Python file (can be empty). It tells Python that this folder is an importable module.
 
-### Paso 2: Tu primer test
+### Step 2: Your first test
 
-Abre `test/test_calculations.py` y escribe:
+Open `test/test_calculations.py` and write:
 
 ```python
 """
-Tests para el módulo de cálculos nutricionales.
+Tests for the nutritional calculation module.
 
-Este archivo prueba todas las funciones matemáticas en app/calculations.py
-para asegurar que hacen exactamente lo que se espera.
+This file tests all mathematical functions in app/calculations.py
+to ensure they do exactly what is expected.
 """
 
 from app.calculations import get_age_reduction
@@ -148,54 +148,54 @@ from app.calculations import get_age_reduction
 
 def test_age_reduction_under_40():
     """
-    Cuando la edad es menor a 40 años, no debe haber reducción.
+    When age is less than 40 years, there should be no reduction.
 
-    Esto es importante porque según la lógica clínica, el metabolismo
-    es máximo hasta los 40 años, luego comienza a disminuir.
+    This is important because according to clinical logic, metabolism
+    is maximum until age 40, then begins to decrease.
     """
     # Arrange
-    edad = 35
+    age = 35
 
     # Act
-    resultado = get_age_reduction(edad)
+    result = get_age_reduction(age)
 
     # Assert
-    assert resultado == 0
+    assert result == 0
 ```
 
-**¿Por qué cada función tiene docstring?**
+**Why does each function have a docstring?**
 
-Porque en 3 meses tú (o un compañero) leerá este test y querrá saber:
-- ¿Qué estoy probando?
-- ¿Por qué es importante?
-- ¿Cuál es el caso de uso?
+Because in 3 months you (or a colleague) will read this test and want to know:
+- What am I testing?
+- Why is it important?
+- What's the use case?
 
-### Paso 3: Ejecutar el test
+### Step 3: Run the test
 
 ```bash
-# Desde la raíz del proyecto
+# From the project root
 pytest test/test_calculations.py::test_age_reduction_under_40 -v
 ```
 
-Deberías ver:
+You should see:
 ```
 test/test_calculations.py::test_age_reduction_under_40 PASSED ✓
 ```
 
-**¡Felicidades! Tu primer test funciona.**
+**Congratulations! Your first test works.**
 
 ---
 
-## Tests de Cálculos
+## Calculation Tests
 
-Aquí va el archivo completo `test/test_calculations.py`:
+Here's the complete `test/test_calculations.py` file:
 
 ```python
 """
-Tests para el módulo de cálculos nutricionales.
+Tests for the nutritional calculation module.
 
-Este archivo prueba todas las funciones matemáticas en app/calculations.py
-para asegurar que hacen exactamente lo que se espera.
+This file tests all mathematical functions in app/calculations.py
+to ensure they do exactly what is expected.
 """
 
 import pytest
@@ -209,186 +209,186 @@ from app.calculations import (
 
 
 # ============================================================================
-# TESTS DE REDUCCIÓN POR EDAD
+# AGE REDUCTION TESTS
 # ============================================================================
 
 class TestAgeReduction:
-    """Agrupa todos los tests relacionados con la reducción por edad."""
+    """Groups all tests related to age reduction."""
 
     def test_age_under_40_no_reduction(self):
-        """Menores de 40 años no tienen reducción calórica."""
+        """People under 40 years old have no caloric reduction."""
         assert get_age_reduction(18) == 0
         assert get_age_reduction(35) == 0
         assert get_age_reduction(39) == 0
 
     def test_age_40_to_49_reduction_100(self):
-        """Entre 40-49 años, reducción de 100 kcal."""
+        """Ages 40-49 have 100 kcal reduction."""
         assert get_age_reduction(40) == 100
         assert get_age_reduction(45) == 100
         assert get_age_reduction(49) == 100
 
     def test_age_50_to_59_reduction_200(self):
-        """Entre 50-59 años, reducción de 200 kcal."""
+        """Ages 50-59 have 200 kcal reduction."""
         assert get_age_reduction(50) == 200
         assert get_age_reduction(55) == 200
         assert get_age_reduction(59) == 200
 
     def test_age_60_to_69_reduction_300(self):
-        """Entre 60-69 años, reducción de 300 kcal."""
+        """Ages 60-69 have 300 kcal reduction."""
         assert get_age_reduction(60) == 300
         assert get_age_reduction(65) == 300
         assert get_age_reduction(69) == 300
 
     def test_age_70_to_79_reduction_400(self):
-        """Entre 70-79 años, reducción de 400 kcal."""
+        """Ages 70-79 have 400 kcal reduction."""
         assert get_age_reduction(70) == 400
         assert get_age_reduction(75) == 400
         assert get_age_reduction(79) == 400
 
     def test_age_80_plus_reduction_500(self):
-        """80+ años, reducción de 500 kcal."""
+        """Age 80+ has 500 kcal reduction."""
         assert get_age_reduction(80) == 500
         assert get_age_reduction(90) == 500
         assert get_age_reduction(120) == 500
 
 
 # ============================================================================
-# TESTS DE FACTORES DE ACTIVIDAD
+# ACTIVITY FACTOR TESTS
 # ============================================================================
 
 class TestActivityFactor:
-    """Prueba que cada nivel de actividad retorne el factor Harris-Benedict correcto."""
+    """Tests that each activity level returns the correct Harris-Benedict multiplier."""
 
     def test_activity_1_sedentary(self):
-        """Nivel 1 (Sedentario) = multiplicador 1.2"""
+        """Level 1 (Sedentary) = multiplier 1.2"""
         assert get_activity_factor(1) == 1.2
 
     def test_activity_2_light(self):
-        """Nivel 2 (Ligero) = multiplicador 1.375"""
+        """Level 2 (Light) = multiplier 1.375"""
         assert get_activity_factor(2) == 1.375
 
     def test_activity_3_moderate(self):
-        """Nivel 3 (Moderado) = multiplicador 1.55"""
+        """Level 3 (Moderate) = multiplier 1.55"""
         assert get_activity_factor(3) == 1.55
 
     def test_activity_4_heavy(self):
-        """Nivel 4 (Fuerte) = multiplicador 1.725"""
+        """Level 4 (Heavy) = multiplier 1.725"""
         assert get_activity_factor(4) == 1.725
 
     def test_activity_5_very_heavy(self):
-        """Nivel 5 (Muy Fuerte) = multiplicador 1.9"""
+        """Level 5 (Very Heavy) = multiplier 1.9"""
         assert get_activity_factor(5) == 1.9
 
     def test_activity_invalid_defaults_to_1_2(self):
-        """Si recibe un valor inválido, retorna 1.2 por defecto."""
+        """Invalid values default to 1.2."""
         assert get_activity_factor(10) == 1.2
         assert get_activity_factor(0) == 1.2
 
 
 # ============================================================================
-# TESTS DE CORRECCIÓN DE PESO (OBESIDAD)
+# WEIGHT ADJUSTMENT TESTS (OBESITY)
 # ============================================================================
 
 class TestAdjustedWeight:
-    """Prueba la fórmula de corrección de peso para pacientes con BMI >= 30."""
+    """Tests the weight correction formula for patients with BMI >= 30."""
 
     def test_normal_weight_no_adjustment(self):
         """
-        BMI normal (< 30) no se ajusta.
+        Normal BMI (< 30) is not adjusted.
 
-        Persona: 70 kg, 170 cm
+        Person: 70 kg, 170 cm
         BMI = 70 / (1.70^2) = 24.22 (normal)
         """
-        peso = 70
-        altura = 170
-        resultado = get_adjusted_weight(peso, altura)
-        assert resultado == peso  # Sin cambios
+        weight = 70
+        height = 170
+        result = get_adjusted_weight(weight, height)
+        assert result == weight  # No changes
 
     def test_overweight_no_adjustment(self):
         """
-        Sobrepeso (BMI 25-29.9) no se ajusta.
+        Overweight (BMI 25-29.9) is not adjusted.
 
-        Persona: 85 kg, 170 cm
-        BMI = 85 / (1.70^2) = 29.41 (sobrepeso)
+        Person: 85 kg, 170 cm
+        BMI = 85 / (1.70^2) = 29.41 (overweight)
         """
-        peso = 85
-        altura = 170
-        resultado = get_adjusted_weight(peso, altura)
-        assert resultado == peso
+        weight = 85
+        height = 170
+        result = get_adjusted_weight(weight, height)
+        assert result == weight
 
     def test_obese_weight_is_adjusted(self):
         """
-        BMI >= 30 se ajusta usando fórmula clínica.
+        BMI >= 30 is adjusted using clinical formula.
 
-        Persona: 110 kg, 170 cm
-        BMI = 110 / (1.70^2) = 38.05 (obeso)
+        Person: 110 kg, 170 cm
+        BMI = 110 / (1.70^2) = 38.05 (obese)
 
-        La función debe retornar menos peso que el real.
+        The function should return less weight than the actual.
         """
-        peso_real = 110
-        altura = 170
-        peso_ajustado = get_adjusted_weight(peso_real, altura)
+        actual_weight = 110
+        height = 170
+        adjusted_weight = get_adjusted_weight(actual_weight, height)
 
-        # El peso ajustado debe ser menor que el real
-        assert peso_ajustado < peso_real
+        # Adjusted weight must be less than actual
+        assert adjusted_weight < actual_weight
 
-        # Debe seguir siendo realista (no puede ser negativo o muy pequeño)
-        assert peso_ajustado > 50
+        # Must remain realistic (not negative or too small)
+        assert adjusted_weight > 50
 
     def test_height_safety_check(self):
         """
-        Si altura es demasiado pequeña (< 50 cm), retorna peso sin cambios.
+        If height is too small (< 50 cm), returns weight unchanged.
 
-        Esto previene divisiones por cero o valores absurdos.
+        This prevents division by zero or absurd values.
         """
-        peso = 80
-        altura_absurda = 30  # Impossible
-        resultado = get_adjusted_weight(peso, altura_absurda)
-        assert resultado == peso
+        weight = 80
+        absurd_height = 30  # Impossible
+        result = get_adjusted_weight(weight, absurd_height)
+        assert result == weight
 
 
 # ============================================================================
-# TESTS DE CÁLCULO DE BMR (Basal Metabolic Rate)
+# BMR CALCULATION TESTS (Basal Metabolic Rate)
 # ============================================================================
 
 class TestCalculateBMR:
-    """Prueba la fórmula de Harris-Benedict para BMR."""
+    """Tests the Harris-Benedict formula for BMR."""
 
     def test_bmr_male_typical(self):
         """
-        Hombre típico: 80 kg, 180 cm, 35 años.
-        Esperado: ~1700 kcal (rango aproximado)
+        Typical male: 80 kg, 180 cm, 35 years old.
+        Expected: ~1700 kcal (approximate range)
         """
         bmr = calculate_bmr("H", 80, 180, 35)
 
-        # Es un rango para permitir pequeñas variaciones de redondeo
+        # Range allows for small rounding variations
         assert 1650 < bmr < 1750
 
     def test_bmr_female_typical(self):
         """
-        Mujer típica: 65 kg, 165 cm, 35 años.
-        Esperado: ~1400 kcal (rango aproximado)
+        Typical female: 65 kg, 165 cm, 35 years old.
+        Expected: ~1400 kcal (approximate range)
         """
         bmr = calculate_bmr("M", 65, 165, 35)
 
         assert 1350 < bmr < 1450
 
     def test_bmr_men_higher_than_women(self):
-        """Hombres gastan más calorías en reposo que mujeres con mismo peso/altura."""
-        bmr_h = calculate_bmr("H", 75, 170, 30)
-        bmr_m = calculate_bmr("M", 75, 170, 30)
+        """Men burn more calories at rest than women with same weight/height."""
+        bmr_m = calculate_bmr("H", 75, 170, 30)
+        bmr_w = calculate_bmr("M", 75, 170, 30)
 
-        assert bmr_h > bmr_m
+        assert bmr_m > bmr_w
 
     def test_bmr_increases_with_weight(self):
-        """A mayor peso, mayor BMR (más masa requiere más energía)."""
+        """Higher weight means higher BMR (more mass requires more energy)."""
         bmr_light = calculate_bmr("H", 60, 180, 30)
         bmr_heavy = calculate_bmr("H", 100, 180, 30)
 
         assert bmr_heavy > bmr_light
 
     def test_bmr_decreases_with_age(self):
-        """El metabolismo disminuye con la edad."""
+        """Metabolism decreases with age."""
         bmr_young = calculate_bmr("H", 80, 180, 25)
         bmr_old = calculate_bmr("H", 80, 180, 65)
 
@@ -396,18 +396,18 @@ class TestCalculateBMR:
 
 
 # ============================================================================
-# TESTS DE CÁLCULO DE TDEE (Total Daily Energy Expenditure)
+# TDEE CALCULATION TESTS (Total Daily Energy Expenditure)
 # ============================================================================
 
 class TestCalculateTDEE:
-    """Prueba el cálculo del gasto energético total."""
+    """Tests the total daily energy expenditure calculation."""
 
     def test_tdee_basic_calculation(self):
         """
-        TDEE = (BMR * factor_actividad) - reduccion_edad
+        TDEE = (BMR * activity_factor) - age_reduction
 
-        Si BMR=1800, factor=1.55, reducción=100
-        Esperado: (1800 * 1.55) - 100 = 2790 - 100 = 2690
+        If BMR=1800, factor=1.55, reduction=100
+        Expected: (1800 * 1.55) - 100 = 2790 - 100 = 2690
         """
         bmr = 1800
         factor = 1.55
@@ -418,20 +418,20 @@ class TestCalculateTDEE:
         assert tdee == 2690
 
     def test_tdee_no_reduction_for_young(self):
-        """Un joven sin reducción por edad."""
+        """Young person without age reduction."""
         bmr = 1600
         factor = 1.55
-        reduction = 0  # Joven < 40 años
+        reduction = 0  # Young < 40 years
 
         tdee = calculate_tdee(bmr, factor, reduction)
 
         assert tdee == 1600 * 1.55
 
     def test_tdee_with_max_reduction(self):
-        """Persona mayor con máxima reducción."""
+        """Older person with maximum reduction."""
         bmr = 1500
-        factor = 1.2  # Sedentario
-        reduction = 500  # 80+ años
+        factor = 1.2  # Sedentary
+        reduction = 500  # Age 80+
 
         tdee = calculate_tdee(bmr, factor, reduction)
 
@@ -439,16 +439,16 @@ class TestCalculateTDEE:
 
 
 # ============================================================================
-# TESTS DE INTEGRACIÓN (Flujo completo)
+# INTEGRATION TESTS (Complete Flow)
 # ============================================================================
 
 class TestIntegration:
-    """Prueba que todas las funciones funcionen juntas correctamente."""
+    """Tests that all functions work together correctly."""
 
     def test_complete_calculation_flow_normal_person(self):
         """
-        Flujo completo para persona normal:
-        - Hombre, 80 kg, 180 cm, 35 años, actividad 3
+        Complete flow for a normal person:
+        - Male, 80 kg, 180 cm, 35 years old, activity level 3
         """
         # Arrange
         gender = "H"
@@ -465,16 +465,16 @@ class TestIntegration:
         tdee = calculate_tdee(bmr, activity_factor, age_reduction)
 
         # Assert
-        assert adjusted_weight == weight  # Sin corrección por BMI normal
-        assert age_reduction == 0  # Menor de 40
+        assert adjusted_weight == weight  # No adjustment for normal BMI
+        assert age_reduction == 0  # Less than 40
         assert activity_factor == 1.55
-        assert tdee > 2000  # Debe ser un valor realista
+        assert tdee > 2000  # Must be realistic
         assert tdee < 3000
 
     def test_complete_calculation_flow_obese_person(self):
         """
-        Flujo completo para persona con obesidad:
-        - Mujer, 110 kg, 165 cm, 55 años, actividad 2
+        Complete flow for an obese person:
+        - Female, 110 kg, 165 cm, 55 years old, activity level 2
         """
         # Arrange
         gender = "M"
@@ -491,36 +491,36 @@ class TestIntegration:
         tdee = calculate_tdee(bmr, activity_factor, age_reduction)
 
         # Assert
-        assert adjusted_weight < weight  # Con corrección por BMI >= 30
-        assert age_reduction == 200  # Entre 50-59
+        assert adjusted_weight < weight  # Adjusted for BMI >= 30
+        assert age_reduction == 200  # Age 50-59
         assert activity_factor == 1.375
         assert tdee > 1500
         assert tdee < 2500
 ```
 
-**¿Por qué uso clases (class TestAgeReduction)?**
+**Why do I use classes (class TestAgeReduction)?**
 
-Las clases agrupan tests relacionados. Es como organizar con carpetas mentales:
-- Todos los tests de edad juntos
-- Todos los tests de actividad juntos
-- Todos los tests de BMR juntos
+Classes group related tests together. It's like organizing with mental folders:
+- All age tests together
+- All activity tests together
+- All BMR tests together
 
-Esto hace que el código sea más fácil de navegar cuando tienes muchos tests.
+This makes the code easier to navigate when you have many tests.
 
 ---
 
-## Tests de API
+## API Tests
 
-Ahora crea `test/test_api.py`:
+Now create `test/test_api.py`:
 
 ```python
 """
-Tests para los endpoints de la API FastAPI.
+Tests for FastAPI endpoints.
 
-Estos tests prueban que:
-1. Los endpoints responden correctamente
-2. La validación de entrada funciona
-3. Los errores se retornan con formato correcto
+These tests verify that:
+1. Endpoints respond correctly
+2. Input validation works
+3. Errors are returned in the correct format
 """
 
 import pytest
@@ -528,25 +528,25 @@ from fastapi.testclient import TestClient
 from app.api import app
 
 
-# Crea un cliente de prueba que simula requests HTTP
+# Create a test client that simulates HTTP requests
 client = TestClient(app)
 
 
 # ============================================================================
-# TESTS DE ENDPOINTS BÁSICOS
+# BASIC ENDPOINT TESTS
 # ============================================================================
 
 class TestHealthCheck:
-    """Tests para el endpoint de salud del API."""
+    """Tests for the API health check endpoint."""
 
     def test_home_endpoint_returns_200(self):
-        """El endpoint GET / debe responder con 200 OK."""
+        """The GET / endpoint should respond with 200 OK."""
         response = client.get("/")
 
         assert response.status_code == 200
 
     def test_home_endpoint_has_message(self):
-        """El endpoint GET / debe retornar un mensaje."""
+        """The GET / endpoint should return a message."""
         response = client.get("/")
         data = response.json()
 
@@ -554,17 +554,17 @@ class TestHealthCheck:
 
 
 # ============================================================================
-# TESTS DE CÁLCULO CON ENTRADA VÁLIDA
+# CALCULATE ENDPOINT WITH VALID INPUT
 # ============================================================================
 
 class TestCalculateValidInput:
-    """Prueba que el endpoint /calculate acepta entrada válida."""
+    """Tests that the /calculate endpoint accepts valid input."""
 
     def test_calculate_with_all_fields_valid(self):
         """
-        Test básico: enviar todos los campos correctos.
+        Basic test: send all correct fields.
 
-        Este es el "happy path" - cuando todo está bien.
+        This is the "happy path" - when everything is fine.
         """
         response = client.post("/calculate", json={
             "sexo": "H",
@@ -574,22 +574,22 @@ class TestCalculateValidInput:
             "nivel_actividad": 3
         })
 
-        # Verificar que la respuesta fue exitosa
+        # Verify response was successful
         assert response.status_code == 200
 
         data = response.json()
 
-        # Verificar que retorna éxito
+        # Verify it returns success
         assert data["status"] == "success"
 
-        # Verificar que tiene todos los campos esperados
+        # Verify it has all expected fields
         assert "total_calorias_diarias" in data
         assert "calorias_en_reposo" in data
         assert "peso_utilizado_kg" in data
         assert "kcal_actividad" in data
 
     def test_calculate_with_float_decimals(self):
-        """Debe aceptar decimales con punto."""
+        """Should accept decimals with period."""
         response = client.post("/calculate", json={
             "sexo": "M",
             "peso": 65.5,
@@ -602,11 +602,11 @@ class TestCalculateValidInput:
         assert response.json()["status"] == "success"
 
     def test_calculate_with_string_comma_decimals(self):
-        """Debe aceptar decimales con coma (formato español)."""
+        """Should accept decimals with comma (Spanish format)."""
         response = client.post("/calculate", json={
             "sexo": "H",
-            "peso": "80,5",           # String con coma
-            "altura": "180,2",        # String con coma
+            "peso": "80,5",           # String with comma
+            "altura": "180,2",        # String with comma
             "edad": 35,
             "nivel_actividad": 3
         })
@@ -615,10 +615,10 @@ class TestCalculateValidInput:
         assert response.json()["status"] == "success"
 
     def test_calculate_with_string_numbers(self):
-        """Debe aceptar números como strings."""
+        """Should accept numbers as strings."""
         response = client.post("/calculate", json={
             "sexo": "H",
-            "peso": "75",             # String sin decimales
+            "peso": "75",             # String without decimals
             "altura": "175",
             "edad": "28",
             "nivel_actividad": "3"
@@ -628,8 +628,8 @@ class TestCalculateValidInput:
         assert response.json()["status"] == "success"
 
     def test_calculate_both_genders(self):
-        """Debe funcionar tanto para hombres como mujeres."""
-        # Hombre
+        """Should work for both males and females."""
+        # Male
         response_h = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
@@ -639,7 +639,7 @@ class TestCalculateValidInput:
         })
         assert response_h.json()["status"] == "success"
 
-        # Mujer
+        # Female
         response_m = client.post("/calculate", json={
             "sexo": "M",
             "peso": 65,
@@ -649,13 +649,13 @@ class TestCalculateValidInput:
         })
         assert response_m.json()["status"] == "success"
 
-        # Los resultados deben ser diferentes (hombres gastan más)
+        # Results should be different (men burn more)
         tdee_h = response_h.json()["total_calorias_diarias"]
         tdee_m = response_m.json()["total_calorias_diarias"]
         assert tdee_h > tdee_m
 
     def test_calculate_all_activity_levels(self):
-        """Debe aceptar niveles de actividad 1-5."""
+        """Should accept activity levels 1-5."""
         for activity in range(1, 6):
             response = client.post("/calculate", json={
                 "sexo": "H",
@@ -669,20 +669,20 @@ class TestCalculateValidInput:
 
 
 # ============================================================================
-# TESTS DE VALIDACIÓN (ENTRADAS INVÁLIDAS)
+# VALIDATION TESTS (INVALID INPUT)
 # ============================================================================
 
 class TestCalculateValidation:
-    """Prueba que la validación rechaza entrada inválida."""
+    """Tests that validation rejects invalid input."""
 
     def test_invalid_gender(self):
         """
-        Solo se permiten 'H' o 'M'.
+        Only 'H' or 'M' are allowed.
 
-        Cualquier otro valor debe retornar error.
+        Any other value should return an error.
         """
         response = client.post("/calculate", json={
-            "sexo": "X",  # Inválido
+            "sexo": "X",  # Invalid
             "peso": 80,
             "altura": 180,
             "edad": 35,
@@ -693,9 +693,9 @@ class TestCalculateValidation:
         assert response.json()["status"] == "error"
 
     def test_invalid_gender_lowercase(self):
-        """Debe convertir a mayúscula automáticamente."""
+        """Should automatically convert to uppercase."""
         response = client.post("/calculate", json={
-            "sexo": "h",  # Minúscula, debe convertirse a "H"
+            "sexo": "h",  # Lowercase, should convert to "H"
             "peso": 80,
             "altura": 180,
             "edad": 35,
@@ -707,45 +707,44 @@ class TestCalculateValidation:
 
     def test_age_too_young(self):
         """
-        La calculadora es solo para mayores de 18.
+        Calculator is only for adults (18+).
 
-        Menores de edad deben ser rechazados.
+        Minors should be rejected.
         """
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
-            "edad": 17,  # Menor de edad
+            "edad": 17,  # Under 18
             "nivel_actividad": 3
         })
 
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "error"
-        # El mensaje debe mencionar que es para adultos
-        assert "adulto" in data["message"].lower()
+        assert "adult" in data["message"].lower()
 
     def test_activity_out_of_range_too_low(self):
-        """Actividad menor a 1 debe ser rechazada."""
+        """Activity less than 1 should be rejected."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
             "edad": 35,
-            "nivel_actividad": 0  # Inválido
+            "nivel_actividad": 0  # Invalid
         })
 
         assert response.status_code == 200
         assert response.json()["status"] == "error"
 
     def test_activity_out_of_range_too_high(self):
-        """Actividad mayor a 5 debe ser rechazada."""
+        """Activity greater than 5 should be rejected."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
             "edad": 35,
-            "nivel_actividad": 10  # Inválido
+            "nivel_actividad": 10  # Invalid
         })
 
         assert response.status_code == 200
@@ -753,26 +752,26 @@ class TestCalculateValidation:
 
     def test_activity_with_decimal(self):
         """
-        La actividad NO debe aceptar decimales.
+        Activity should NOT accept decimals.
 
-        "1.5" es inválido porque debe ser "1" o "2", no intermedio.
+        "1.5" is invalid because it should be "1" or "2", not in between.
         """
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
             "edad": 35,
-            "nivel_actividad": "1.5"  # Inválido
+            "nivel_actividad": "1.5"  # Invalid
         })
 
         assert response.status_code == 200
         assert response.json()["status"] == "error"
 
     def test_invalid_peso_non_numeric(self):
-        """Peso con letras debe ser rechazado."""
+        """Weight with letters should be rejected."""
         response = client.post("/calculate", json={
             "sexo": "H",
-            "peso": "ochenta",  # No numérico
+            "peso": "eighty",  # Non-numeric
             "altura": 180,
             "edad": 35,
             "nivel_actividad": 3
@@ -782,11 +781,11 @@ class TestCalculateValidation:
         assert response.json()["status"] == "error"
 
     def test_invalid_height_non_numeric(self):
-        """Altura con letras debe ser rechazada."""
+        """Height with letters should be rejected."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
-            "altura": "alto",  # No numérico
+            "altura": "tall",  # Non-numeric
             "edad": 35,
             "nivel_actividad": 3
         })
@@ -795,12 +794,12 @@ class TestCalculateValidation:
         assert response.json()["status"] == "error"
 
     def test_invalid_age_non_numeric(self):
-        """Edad con letras debe ser rechazada."""
+        """Age with letters should be rejected."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
-            "edad": "treinta",  # No numérico
+            "edad": "thirty",  # Non-numeric
             "nivel_actividad": 3
         })
 
@@ -809,16 +808,16 @@ class TestCalculateValidation:
 
 
 # ============================================================================
-# TESTS DE CAMPOS FALTANTES
+# MISSING FIELDS TESTS
 # ============================================================================
 
 class TestCalculateMissingFields:
-    """Prueba que se rechacen requests con campos faltantes."""
+    """Tests that requests with missing fields are rejected."""
 
     def test_missing_sexo(self):
-        """Si falta 'sexo', debe retornar 422."""
+        """If 'sexo' is missing, should return 422."""
         response = client.post("/calculate", json={
-            # "sexo": "H",  # FALTA
+            # "sexo": "H",  # MISSING
             "peso": 80,
             "altura": 180,
             "edad": 35,
@@ -828,10 +827,10 @@ class TestCalculateMissingFields:
         assert response.status_code == 422
 
     def test_missing_peso(self):
-        """Si falta 'peso', debe retornar 422."""
+        """If 'peso' is missing, should return 422."""
         response = client.post("/calculate", json={
             "sexo": "H",
-            # "peso": 80,  # FALTA
+            # "peso": 80,  # MISSING
             "altura": 180,
             "edad": 35,
             "nivel_actividad": 3
@@ -840,11 +839,11 @@ class TestCalculateMissingFields:
         assert response.status_code == 422
 
     def test_missing_altura(self):
-        """Si falta 'altura', debe retornar 422."""
+        """If 'altura' is missing, should return 422."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
-            # "altura": 180,  # FALTA
+            # "altura": 180,  # MISSING
             "edad": 35,
             "nivel_actividad": 3
         })
@@ -852,46 +851,46 @@ class TestCalculateMissingFields:
         assert response.status_code == 422
 
     def test_missing_edad(self):
-        """Si falta 'edad', debe retornar 422."""
+        """If 'edad' is missing, should return 422."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
-            # "edad": 35,  # FALTA
+            # "edad": 35,  # MISSING
             "nivel_actividad": 3
         })
 
         assert response.status_code == 422
 
     def test_missing_nivel_actividad(self):
-        """Si falta 'nivel_actividad', debe retornar 422."""
+        """If 'nivel_actividad' is missing, should return 422."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
             "altura": 180,
             "edad": 35
-            # "nivel_actividad": 3  # FALTA
+            # "nivel_actividad": 3  # MISSING
         })
 
         assert response.status_code == 422
 
 
 # ============================================================================
-# TESTS DE CASOS ESPECIALES
+# SPECIAL CASES
 # ============================================================================
 
 class TestCalculateSpecialCases:
-    """Prueba casos especiales y bordes."""
+    """Tests special cases and edge cases."""
 
     def test_obese_person_weight_adjustment(self):
         """
-        Persona con obesidad debe tener peso ajustado.
+        Obese person should have weight adjusted.
 
-        La respuesta debe mostrar "peso_utilizado_kg" menor que el enviado.
+        Response should show "peso_utilizado_kg" less than what was sent.
         """
         response = client.post("/calculate", json={
             "sexo": "H",
-            "peso": 150,  # BMI muy alto
+            "peso": 150,  # Very high BMI
             "altura": 170,
             "edad": 45,
             "nivel_actividad": 2
@@ -900,32 +899,32 @@ class TestCalculateSpecialCases:
         assert response.status_code == 200
         data = response.json()
 
-        # El peso utilizado debe ser menor que el real
+        # Used weight must be less than actual
         assert data["peso_utilizado_kg"] < 150
 
     def test_supplementation_warning_appears(self):
         """
-        Si TDEE < 1800 y hay corrección de peso, debe haber aviso.
+        If TDEE < 1800 and weight is adjusted, warning should appear.
 
-        Esto protege al usuario de desnutrición.
+        This protects the user from malnutrition.
         """
         response = client.post("/calculate", json={
             "sexo": "M",
-            "peso": 120,  # Obesa
-            "altura": 150,  # Baja
+            "peso": 120,  # Obese
+            "altura": 150,  # Short
             "edad": 60,
-            "nivel_actividad": 1  # Sedentario
+            "nivel_actividad": 1  # Sedentary
         })
 
         assert response.status_code == 200
         data = response.json()
 
-        # Verificar que hay warning de suplementación
+        # Check for supplementation warning
         if data["suplementacion_requerida"]:
             assert len(data["aviso_suplementacion"]) > 0
 
     def test_response_format_includes_disclaimers(self):
-        """La respuesta siempre debe incluir avisos legales."""
+        """Response should always include legal disclaimers."""
         response = client.post("/calculate", json={
             "sexo": "H",
             "peso": 80,
@@ -942,15 +941,15 @@ class TestCalculateSpecialCases:
 
 
 # ============================================================================
-# TIPS PARA DEBUGGING
+# DEBUGGING TIPS
 # ============================================================================
 
 def test_debug_example():
     """
-    Ejemplo de cómo debuggear un test que no entiendes.
+    Example of how to debug a test you don't understand.
 
-    Descomenta print() para ver valores durante ejecución.
-    Ejecuta con: pytest -s
+    Uncomment print() to see values during execution.
+    Run with: pytest -s
     """
     response = client.post("/calculate", json={
         "sexo": "H",
@@ -968,103 +967,103 @@ def test_debug_example():
 
 ---
 
-## Ejecutar Tests
+## Running Tests
 
-### Ejecutar TODO
+### Run Everything
 
 ```bash
-# Todos los tests (recomendado)
+# All tests (recommended)
 pytest
 
-# Con output más detallado
+# With more detailed output
 pytest -v
 
-# Mostrando prints
+# Showing prints
 pytest -s
 ```
 
-### Ejecutar Tests Específicos
+### Run Specific Tests
 
 ```bash
-# Solo tests de cálculos
+# Only calculation tests
 pytest test/test_calculations.py
 
-# Una clase específica
+# A specific class
 pytest test/test_calculations.py::TestAgeReduction
 
-# Una función específica
+# A specific function
 pytest test/test_calculations.py::TestAgeReduction::test_age_under_40_no_reduction
 
-# Solo tests de API
+# Only API tests
 pytest test/test_api.py
 
-# Tests que coincidan con un patrón
-pytest -k "age_reduction"  # Todo lo con "age_reduction"
+# Tests matching a pattern
+pytest -k "age_reduction"  # Everything with "age_reduction"
 ```
 
-### Ver Cobertura
+### View Coverage
 
 ```bash
-# Qué porcentaje de código está siendo testeado
+# What percentage of code is being tested
 pytest --cov=app
 
-# Reporte en HTML (abre htmlcov/index.html)
+# HTML report (opens htmlcov/index.html)
 pytest --cov=app --cov-report=html
 ```
 
-### Opciones Útiles
+### Useful Options
 
 ```bash
-# Parar en el primer error
+# Stop at first error
 pytest -x
 
-# Correr solo tests que fallaron la última vez
+# Run only tests that failed last time
 pytest --lf
 
-# Mostrar los 3 tests más lentos
+# Show the 3 slowest tests
 pytest --durations=3
 
-# Debugger interactivo en fallos
+# Interactive debugger on failures
 pytest --pdb
 ```
 
 ---
 
-## Buenas Prácticas
+## Best Practices
 
-### ✅ DO's (Haz esto)
+### ✅ DO's (Do this)
 
-**1. Nombres descriptivos**
+**1. Descriptive names**
 ```python
-# ✅ BIEN - Se entiende qué se prueba
+# ✅ GOOD - It's clear what's being tested
 def test_age_reduction_40_to_50_returns_100():
     pass
 
-# ❌ MAL - Muy genérico
+# ❌ BAD - Too generic
 def test_age_reduction():
     pass
 ```
 
-**2. Un assert por test (idealmente)**
+**2. One assertion per test (ideally)**
 ```python
-# ✅ BIEN
+# ✅ GOOD
 def test_activity_factor_1_is_1_2():
     assert get_activity_factor(1) == 1.2
 
 def test_activity_factor_5_is_1_9():
     assert get_activity_factor(5) == 1.9
 
-# ❌ EVITAR - Múltiples asserts no relacionados
+# ❌ AVOID - Multiple unrelated assertions
 def test_activity_factors():
     assert get_activity_factor(1) == 1.2
     assert get_activity_factor(2) == 1.375
     assert get_activity_factor(3) == 1.55
-    # Si falla el tercero, nunca sabemos si 1 y 2 pasaron
+    # If the third fails, we never know if 1 and 2 passed
 ```
 
-**3. Docstrings explicativos**
+**3. Explanatory docstrings**
 ```python
-# ✅ BIEN
+# ✅ GOOD
 def test_bmi_obese_adjustment():
     """
     Verify weight adjustment for BMI >= 30.
@@ -1074,14 +1073,14 @@ def test_bmi_obese_adjustment():
     """
     pass
 
-# ❌ MAL - Sin explicación
+# ❌ BAD - No explanation
 def test_weight():
     pass
 ```
 
-**4. Valores realistas**
+**4. Realistic values**
 ```python
-# ✅ BIEN - Datos que existen en la vida real
+# ✅ GOOD - Data that exists in real life
 def test_normal_person():
     response = client.post("/calculate", json={
         "sexo": "H",
@@ -1091,12 +1090,12 @@ def test_normal_person():
         "nivel_actividad": 3
     })
 
-# ❌ EVITAR - Valores absurdos
+# ❌ AVOID - Absurd values
 def test_weird_person():
     response = client.post("/calculate", json={
         "sexo": "H",
-        "peso": 999999,  # Imposible
-        "altura": 5,      # Imposible
+        "peso": 999999,  # Impossible
+        "altura": 5,      # Impossible
         "edad": 35,
         "nivel_actividad": 3
     })
@@ -1104,39 +1103,39 @@ def test_weird_person():
 
 **5. AAA Pattern (Arrange-Act-Assert)**
 ```python
-# ✅ BIEN - Estructura clara
+# ✅ GOOD - Clear structure
 def test_example():
     # ARRANGE
-    edad = 45
+    age = 45
 
     # ACT
-    resultado = get_age_reduction(edad)
+    result = get_age_reduction(age)
 
     # ASSERT
-    assert resultado == 100
+    assert result == 100
 ```
 
-### ❌ DON'Ts (No hagas esto)
+### ❌ DON'Ts (Don't do this)
 
-**1. Tests que dependen uno del otro**
+**1. Tests that depend on each other**
 ```python
-# ❌ MAL - Test 2 depende de Test 1
+# ❌ BAD - Test 2 depends on Test 1
 def test_1_create_user():
     global user_id
     user_id = create_user("John")
 
 def test_2_get_user():
-    user = get_user(user_id)  # ¿Qué pasa si test_1 falla?
+    user = get_user(user_id)  # What if test_1 fails?
 ```
 
-**2. Tests demasiado grandes**
+**2. Tests that are too large**
 ```python
-# ❌ MAL - Demasiado para un test
+# ❌ BAD - Too much for one test
 def test_everything():
-    # ... 100 líneas de código ...
+    # ... 100 lines of code ...
     pass
 
-# ✅ BIEN - Tests pequeños y enfocados
+# ✅ GOOD - Small and focused
 def test_age_validation():
     pass
 
@@ -1147,14 +1146,14 @@ def test_calculation_accuracy():
     pass
 ```
 
-**3. Hardcodear valores mágicos**
+**3. Hardcoding magic values**
 ```python
-# ❌ MAL - ¿Por qué 24.82?
+# ❌ BAD - Why 24.82?
 def test_weight_adjustment():
     adjusted = get_adjusted_weight(100, 170)
     assert adjusted == 24.82
 
-# ✅ BIEN - Con nombre descriptivo
+# ✅ GOOD - With descriptive name
 def test_weight_adjustment():
     EXPECTED_ADJUSTED_WEIGHT = 24.82
     adjusted = get_adjusted_weight(100, 170)
@@ -1167,122 +1166,122 @@ def test_weight_adjustment():
 
 ### Error: "ModuleNotFoundError: No module named 'app'"
 
-**Causa**: Pytest no encuentra tu módulo `app`.
+**Cause**: Pytest can't find your `app` module.
 
-**Solución**:
+**Solution**:
 ```bash
-# Ejecuta desde la raíz del proyecto, no desde test/
+# Run from project root, not from test/
 cd nutrition_calculator
 pytest
 
-# O especifica la ruta
+# Or specify the path
 pytest test/test_api.py
 ```
 
 ### Error: "ImportError: cannot import name 'get_age_reduction'"
 
-**Causa**: La función no existe o el nombre está mal escrito.
+**Cause**: The function doesn't exist or the name is misspelled.
 
-**Solución**:
+**Solution**:
 ```bash
-# Verifica que existe en calculations.py
+# Check that it exists in calculations.py
 grep "def get_age_reduction" app/calculations.py
 
-# Verifica que importaste correctamente
+# Check that you imported correctly
 # from app.calculations import get_age_reduction
 ```
 
-### Tests pasan localmente pero fallan en CI/CD
+### Tests pass locally but fail in CI/CD
 
-**Causa**: Diferencias de ambiente (versiones de librerías).
+**Cause**: Environment differences (library versions).
 
-**Solución**:
+**Solution**:
 ```bash
-# Actualiza requirements.txt con versiones exactas
+# Update requirements.txt with exact versions
 pip freeze > requirements.txt
 
-# O usa un archivo de testing separado
+# Or use a separate testing file
 requirements-test.txt
 ```
 
 ### "AssertionError: assert 1700.5 == 1700"
 
-**Causa**: Errores de redondeo en cálculos flotantes.
+**Cause**: Rounding errors in float calculations.
 
-**Solución**:
+**Solution**:
 ```python
-# ❌ MAL - Comparación exacta
+# ❌ BAD - Exact comparison
 assert bmr == 1700
 
-# ✅ BIEN - Permite pequeña variación
+# ✅ GOOD - Allows small variation
 assert 1650 < bmr < 1750
 
-# O usa pytest.approx
+# Or use pytest.approx
 assert bmr == pytest.approx(1700, abs=50)
 ```
 
 ---
 
-## Próximos Pasos
+## Next Steps
 
-1. **Crea los archivos**:
+1. **Create the files**:
    ```bash
    touch test/__init__.py
    touch test/test_calculations.py
    touch test/test_api.py
    ```
 
-2. **Copia los tests** de esta guía a esos archivos
+2. **Copy the tests** from this guide to those files
 
-3. **Ejecuta**:
+3. **Run**:
    ```bash
    pytest -v
    ```
 
-4. **Revisa fallos**: ¿Qué tests fallan? Investiga por qué
+4. **Review failures**: Which tests are failing? Why?
 
-5. **Itera**: Añade más tests según necesites
-
----
-
-## Resumen de Conceptos Clave
-
-| Concepto | Qué es | Por qué importa |
-|----------|--------|-----------------|
-| **Test Unitario** | Prueba de una función pequeña | Detecta bugs rápido y en aislamiento |
-| **Fixture** | Datos de prueba reutilizables | DRY (Don't Repeat Yourself) |
-| **Mock** | Simular comportamiento | Testear sin dependencias externas |
-| **Cobertura** | % de código testeado | Medir calidad de tests |
-| **CI/CD** | Tests automáticos en cada push | Prevenir bugs antes de producción |
+5. **Iterate**: Add more tests as needed
 
 ---
 
-## Preguntas Frecuentes para Mentees
+## Key Concepts Summary
 
-**P: ¿Tengo que testear TODO?**
-A: No, enfócate en lógica crítica (cálculos, validación). No testees código trivial (getters/setters simples).
-
-**P: ¿Mi test es muy específico?**
-A: Es mejor ser específico que genérico. Tests específicos son más fáciles de debuggear.
-
-**P: ¿Qué hago si no entiendo el error?**
-A: Lee el error de pytest de arriba a abajo. Ejecuta con `-s` para ver prints. Usa `pytest -pdb` para debuggear interactivamente.
-
-**P: ¿Los tests hacen el proyecto más lento?**
-A: Al principio sí (escribe más código). Pero ahorran tiempo después porque detectan bugs antes.
-
-**P: ¿Cuántos tests escribo?**
-A: Cobertura: 70%+ es bien, 90%+ es excelente. Empieza con los casos más importantes.
+| Concept | What it is | Why it matters |
+|---------|-----------|-----------------|
+| **Unit Test** | Test of a single function | Detects bugs quickly and in isolation |
+| **Fixture** | Reusable test data | DRY (Don't Repeat Yourself) |
+| **Mock** | Simulating behavior | Test without external dependencies |
+| **Coverage** | % of code tested | Measure test quality |
+| **CI/CD** | Automatic tests on each push | Prevent bugs before production |
 
 ---
 
-## Contacto & Recursos
+## FAQ
 
-Si tienes dudas:
+**Q: Do I have to test everything?**
+A: No, focus on critical logic (calculations, validation). Don't test trivial code (simple getters/setters).
+
+**Q: Is my test too specific?**
+A: It's better to be specific than generic. Specific tests are easier to debug.
+
+**Q: What do I do if I don't understand the error?**
+A: Read pytest errors from top to bottom. Run with `-s` to see prints. Use `pytest --pdb` to debug interactively.
+
+**Q: Do tests slow down my project?**
+A: Initially yes (you write more code). But they save time later by catching bugs early.
+
+**Q: How many tests should I write?**
+A: Coverage: 70%+ is good, 90%+ is excellent. Start with the most important cases.
+
+---
+
+## Resources
+
+If you have questions:
 - [Pytest Documentation](https://docs.pytest.org/)
 - [FastAPI Testing Guide](https://fastapi.tiangolo.com/tutorial/testing/)
 - [Python Unit Testing](https://docs.python.org/3/library/unittest.html)
 
 ---
 
-**Escrito con ❤️ como mentoring senior. Ahora tienes todo para escribir tests profesionales. ¡Adelante!**
+**Written with professional quality standards. You now have everything you need to write professional tests. Let's go! 🚀**
