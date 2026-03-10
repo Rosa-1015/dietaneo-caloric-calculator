@@ -34,6 +34,19 @@ Contents:
 
 **Read if**: You want to understand how automated testing works or need to configure CI/CD.
 
+### [FRONTEND_INTEGRATION.md](FRONTEND_INTEGRATION.md)
+**Frontend Integration Reference**
+
+Contents:
+- Quick start (running backend locally)
+- API endpoints and request/response format
+- Validation error handling
+- Testing with interactive Swagger UI
+- Deployment configuration
+- Common issues & solutions
+
+**Read if**: You need the API reference to build the web interface.
+
 ### [../CLAUDE.md](../CLAUDE.md)
 **Architecture & Development Setup**
 
