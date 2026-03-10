@@ -8,8 +8,6 @@ The project follows a modern Python layout to ensure scalability:
 * **`app/`**: Core application directory.
     * **`api.py`**: FastAPI configuration, **custom human-readable error handlers**, and CORS setup.
     * **`calculations.py`**: Core mathematical logic, including **BMI-based weight correction (IMC 24.9)** and age-related metabolism reduction.
-    * **`validations.py`**: Validation utilities and helpers.
-    * **`main.py`**: Alternative API configuration (legacy).
 * **`test/`**: Unit tests directory (pytest-based).
 * **`docs/`**: Developer documentation.
     * **`README.md`**: Documentation index for developers.
@@ -52,10 +50,32 @@ The project follows a modern Python layout to ensure scalability:
     python -m uvicorn app.api:app --reload --port 8001
     ```
 
-## 🔍 Code Quality & Testing
+## 🧪 Running Tests
+
+Run the complete test suite with:
+
+```bash
+pytest
+```
+
+View code coverage:
+
+```bash
+pytest --cov=app --cov-report=term-missing
+```
+
+**Current Test Status:**
+- **35 tests** passing (8 API integration + 27 calculation unit tests)
+- **87% code coverage** on active code
+- **Automated CI/CD** via GitHub Actions - tests run on every push
+
+For detailed testing documentation, see [Testing Guide](docs/TESTS_README.md).
+
+## 🔍 Code Quality
+
 Before pushing changes, ensure the code follows style guidelines:
 
-```powershell
+```bash
 python -m ruff check .
 ```
 
@@ -64,7 +84,8 @@ python -m ruff check .
 For detailed guides on testing, architecture, and development workflows, see the [Developer Documentation](docs/README.md).
 
 Quick links:
-- **[Testing Guide](docs/TESTING.md)** - Complete unit testing guide (pytest, FastAPI)
+- **[Test Suite Guide](docs/TESTS_README.md)** - How to run, write, and understand tests
+- **[Testing Mentor Guide](docs/TESTING.md)** - Complete learning guide (pytest, FastAPI)
 - **[CLAUDE.md](CLAUDE.md)** - Architecture & development setup
 - **[API Documentation](#-api-documentation)** - Endpoint details below
 
