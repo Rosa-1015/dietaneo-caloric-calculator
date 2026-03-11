@@ -8,6 +8,10 @@ The project follows a modern Python layout to ensure scalability:
 * **`app/`**: Core application directory.
     * **`api.py`**: FastAPI configuration, **custom human-readable error handlers**, and CORS setup.
     * **`calculations.py`**: Core mathematical logic, including **BMI-based weight correction (IMC 24.9)** and age-related metabolism reduction.
+* **`frontend/`**: Web interface (HTML + CSS + JavaScript).
+    * **`index.html`**: Nutrition calculator form and results display.
+    * **`styles.css`**: Responsive styling for desktop and mobile.
+    * **`script.js`**: Client-side logic that communicates with the API.
 * **`test/`**: Unit tests directory (pytest-based).
 * **`docs/`**: Developer documentation.
     * **`README.md`**: Documentation index for developers.
@@ -50,6 +54,28 @@ The project follows a modern Python layout to ensure scalability:
     python -m uvicorn app.api:app --reload --port 8001
     ```
 
+## 🌍 Frontend Setup
+
+The frontend is a standalone web application that works with the backend API:
+
+1. **Start the backend** (API must be running on `http://localhost:8001`):
+    ```bash
+    docker compose up --build
+    ```
+
+2. **Open the frontend**:
+    ```bash
+    cd frontend
+    # Then open index.html in your browser (or drag & drop the file)
+    ```
+
+3. **Use the calculator**:
+    - Fill in your personal data (gender, weight, height, age, activity level)
+    - Click "Calcular Calorías" (Calculate Calories)
+    - View your daily caloric needs
+
+**Note**: The frontend can be integrated into WordPress or deployed as a standalone website. See [Frontend Integration Guide](docs/FRONTEND_INTEGRATION.md) for more details.
+
 ## 🧪 Running Tests
 
 Run the complete test suite with:
@@ -84,6 +110,7 @@ python -m ruff check .
 For detailed guides on testing, architecture, and development workflows, see the [Developer Documentation](docs/README.md).
 
 Quick links:
+- **[Frontend Integration Guide](docs/FRONTEND_INTEGRATION.md)** - How to integrate with WordPress or deploy standalone
 - **[Test Suite Guide](docs/TESTS_README.md)** - How to run, write, and understand tests
 - **[Testing Mentor Guide](docs/TESTING.md)** - Complete learning guide (pytest, FastAPI)
 - **[CLAUDE.md](CLAUDE.md)** - Architecture & development setup
