@@ -1,31 +1,31 @@
-// URL de la API (cambiar a tu URL de producción)
+// API endpoint (change to production URL)
 const API_URL = 'http://localhost:8001';
 
-// Obtener referencia al formulario
+// Get form reference
 const form = document.getElementById('calorieForm');
 
-// Escuchar cuando el usuario hace click en "Calcular"
+// Listen for form submission
 form.addEventListener('submit', async (event) => {
-    // Evitar que la página se recargue
+    // Prevent page reload
     event.preventDefault();
 
-    // Obtener los valores del formulario
+    // Get form values
     const gender = document.getElementById('gender').value;
     const weight = document.getElementById('weight').value;
     const height = document.getElementById('height').value;
     const age = document.getElementById('age').value;
     const activity = document.getElementById('activity').value;
 
-    // Convertir comas a puntos (ej: 75,5 → 75.5)
+    // Convert commas to dots (e.g., 75,5 → 75.5)
     const normalizedWeight = weight.replace(',', '.');
     const normalizedHeight = height.replace(',', '.');
     const normalizedAge = age.replace(',', '.');
 
-    // Mostrar indicador de carga
+    // Show loading indicator
     showLoading();
 
     try {
-        // Enviar los datos a la API
+        // Send data to API
         const response = await fetch(`${API_URL}/calculate`, {
             method: 'POST',
             headers: {
@@ -40,31 +40,31 @@ form.addEventListener('submit', async (event) => {
             }),
         });
 
-        // Obtener la respuesta en formato JSON
+        // Parse response as JSON
         const data = await response.json();
 
-        // Ocultar el indicador de carga
+        // Hide loading indicator
         hideLoading();
 
-        // Verificar si hubo un error
+        // Check for API errors
         if (data.status === 'error') {
-            showError(data.message || 'Error desconocido');
+            showError(data.message || 'Unknown error');
             return;
         }
 
-        // Si todo fue bien, mostrar los resultados
+        // Display results if successful
         displayResults(data);
 
     } catch (error) {
-        // Si hay error de conexión, mostrar mensaje
+        // Handle connection errors
         hideLoading();
-        showError(`Error de conexión: ${error.message}`);
+        showError(`Connection error: ${error.message}`);
         console.error('Error:', error);
     }
 });
 
 /**
- * Función: Mostrar el indicador de carga
+ * Display loading indicator
  */
 function showLoading() {
     document.getElementById('loading').style.display = 'block';
@@ -73,14 +73,14 @@ function showLoading() {
 }
 
 /**
- * Función: Ocultar el indicador de carga
+ * Hide loading indicator
  */
 function hideLoading() {
     document.getElementById('loading').style.display = 'none';
 }
 
 /**
- * Función: Mostrar mensaje de error
+ * Display error message to user
  */
 function showError(message) {
     const errorDiv = document.getElementById('errorMessage');
@@ -90,18 +90,18 @@ function showError(message) {
 }
 
 /**
- * Función: Mostrar los resultados calculados
+ * Display calculated results
  */
 function displayResults(data) {
-    // Completar el resultado principal
+    // Set main result
     document.getElementById('totalCalories').textContent =
         Math.round(data.total_calorias_diarias);
 
-    // Completar los detalles
+    // Set BMR
     document.getElementById('bmr').textContent =
         Math.round(data.calorias_en_reposo);
 
-    // Calcular el factor de actividad a partir de los datos devueltos
+    // Calculate activity factor from API response
     const activityFactor = (data.total_calorias_diarias + data.reduccion_edad) / data.calorias_en_reposo;
     document.getElementById('activityFactor').textContent =
         activityFactor.toFixed(2);
@@ -111,7 +111,7 @@ function displayResults(data) {
     document.getElementById('usedWeight').textContent =
         data.peso_utilizado_kg.toFixed(1);
 
-    // Mostrar aviso de suplementación si es necesario
+    // Show supplementation warning if needed
     const supplementationWarning = document.getElementById('supplementationWarning');
     if (data.suplementacion_requerida && data.aviso_suplementacion) {
         document.getElementById('supplementationText').textContent =
@@ -121,33 +121,33 @@ function displayResults(data) {
         supplementationWarning.style.display = 'none';
     }
 
-    // Mostrar recomendación profesional
+    // Display professional recommendation
     if (data.recomendacion) {
         document.getElementById('recommendationText').textContent =
             data.recomendacion;
     }
 
-    // Mostrar aviso legal
+    // Display legal notice
     if (data.aviso_legal) {
         document.getElementById('legalText').textContent =
             data.aviso_legal;
     }
 
-    // Ocultar errores y mostrar resultados
+    // Hide errors and show results
     document.getElementById('errorMessage').style.display = 'none';
     document.getElementById('results').style.display = 'block';
 
-    // Desplazarse hacia los resultados automáticamente
+    // Smooth scroll to results
     document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 }
 
 /**
- * Función: Reiniciar el formulario para calcular nuevamente
+ * Reset form and hide results
  */
 function resetForm() {
     form.reset();
     document.getElementById('results').style.display = 'none';
     document.getElementById('errorMessage').style.display = 'none';
-    // Desplazarse hacia el formulario
+    // Smooth scroll back to form
     form.scrollIntoView({ behavior: 'smooth' });
 }

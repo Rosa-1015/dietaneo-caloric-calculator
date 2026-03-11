@@ -14,11 +14,11 @@
         </header>
 
         <main>
-            <!-- Formulario de entrada -->
+            <!-- Input form -->
             <form id="calorieForm" class="form-section">
                 <h2>Tus Datos</h2>
 
-                <!-- Género -->
+                <!-- Gender -->
                 <div class="form-group">
                     <label for="gender">Género:</label>
                     <select id="gender" name="gender" required>
@@ -28,25 +28,25 @@
                     </select>
                 </div>
 
-                <!-- Peso -->
+                <!-- Weight -->
                 <div class="form-group">
                     <label for="weight">Peso (kg):</label>
                     <input type="text" id="weight" name="weight" placeholder="ej: 75 o 75,5" required>
                 </div>
 
-                <!-- Altura -->
+                <!-- Height -->
                 <div class="form-group">
                     <label for="height">Altura (cm):</label>
                     <input type="text" id="height" name="height" placeholder="ej: 180" required>
                 </div>
 
-                <!-- Edad -->
+                <!-- Age -->
                 <div class="form-group">
                     <label for="age">Edad (años):</label>
                     <input type="text" id="age" name="age" placeholder="ej: 30" required>
                 </div>
 
-                <!-- Nivel de Actividad -->
+                <!-- Activity level -->
                 <div class="form-group">
                     <label for="activity">Nivel de Actividad:</label>
                     <select id="activity" name="activity" required>
@@ -62,15 +62,15 @@
                 <button type="submit" class="btn-primary">Calcular Calorías</button>
             </form>
 
-            <!-- Indicador de carga -->
+            <!-- Loading indicator -->
             <div id="loading" class="loading" style="display: none;">
                 <p>Calculando...</p>
             </div>
 
-            <!-- Área de errores -->
+            <!-- Error message area -->
             <div id="errorMessage" class="error-message" style="display: none;"></div>
 
-            <!-- Área de resultados -->
+            <!-- Results section -->
             <div id="results" class="results-section" style="display: none;">
                 <h2>Tus Resultados</h2>
 
@@ -105,17 +105,17 @@
                     </div>
                 </div>
 
-                <!-- Aviso de suplementación -->
+                <!-- Supplementation warning -->
                 <div id="supplementationWarning" class="warning" style="display: none;">
                     <p id="supplementationText"></p>
                 </div>
 
-                <!-- Recomendación profesional -->
+                <!-- Professional recommendation -->
                 <div class="recommendation">
                     <p id="recommendationText"></p>
                 </div>
 
-                <!-- Aviso legal -->
+                <!-- Legal notice -->
                 <div class="legal-notice">
                     <p id="legalText"></p>
                 </div>

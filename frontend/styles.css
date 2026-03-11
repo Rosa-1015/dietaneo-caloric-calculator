@@ -1,4 +1,4 @@
-/* Variables de colores */
+/* Color variables */
 :root {
     --primary-color: #2563eb;
     --primary-dark: #1e40af;
@@ -11,7 +11,7 @@
     --text-light: #6b7280;
 }
 
-/* Reset y estilos generales */
+/* Reset and general styles */
 * {
     margin: 0;
     padding: 0;
@@ -29,7 +29,7 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Contenedor principal */
+/* Main container */
 .container {
     max-width: 600px;
     margin: 0 auto;
@@ -63,7 +63,7 @@ main {
     margin-bottom: 40px;
 }
 
-/* Secciones */
+/* Sections */
 .form-section h2,
 .results-section h2 {
     font-size: 1.5rem;
@@ -71,7 +71,7 @@ main {
     color: var(--text-dark);
 }
 
-/* Formulario */
+/* Form */
 .form-group {
     margin-bottom: 20px;
 }
@@ -100,7 +100,7 @@ select:focus {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* Botones */
+/* Buttons */
 .btn-primary,
 .btn-secondary {
     padding: 12px 24px;
@@ -140,7 +140,7 @@ select:focus {
     color: white;
 }
 
-/* Loading */
+/* Loading state */
 .loading {
     text-align: center;
     padding: 30px;
@@ -157,7 +157,7 @@ select:focus {
     50% { opacity: 0.5; }
 }
 
-/* Mensajes de error */
+/* Error messages */
 .error-message {
     background-color: #fee2e2;
     border: 1px solid var(--error-color);
@@ -167,7 +167,7 @@ select:focus {
     margin-bottom: 20px;
 }
 
-/* Resultados */
+/* Results section */
 .result-main {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
     color: white;
@@ -194,7 +194,7 @@ select:focus {
     opacity: 0.8;
 }
 
-/* Grid de resultados */
+/* Results grid */
 .results-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -225,7 +225,7 @@ select:focus {
     margin-top: 5px;
 }
 
-/* Avisos y advertencias */
+/* Warnings and alerts */
 .warning {
     background-color: #fef3c7;
     border: 1px solid var(--warning-color);
@@ -266,7 +266,7 @@ footer {
     border-top: 1px solid var(--border-color);
 }
 
-/* Responsive */
+/* Responsive design */
 @media (max-width: 600px) {
     .container {
         padding: 10px;
