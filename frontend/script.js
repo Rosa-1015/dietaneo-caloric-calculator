@@ -1,5 +1,5 @@
 // API endpoint (change to production URL)
-const API_URL = 'http://localhost:8001';
+const API_URL = 'http://91.98.20.231:8001';
 
 // Get form reference
 const form = document.getElementById('calorieForm');
