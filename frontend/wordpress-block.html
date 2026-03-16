@@ -1,0 +1,491 @@
+<!-- ============================================================
+     DIETANEO - Calculadora de Necesidades Calóricas
+     Bloque HTML personalizado para WordPress (Gutenberg)
+     Instrucciones: pegar este código en un bloque "HTML personalizado"
+     ============================================================ -->
+
+<style>
+/* All styles scoped under #dietaneo-calculator to avoid conflicts with WordPress theme */
+#dietaneo-calculator {
+    --dnc-primary: #2563eb;
+    --dnc-primary-dark: #1e40af;
+    --dnc-success: #16a34a;
+    --dnc-warning: #ea580c;
+    --dnc-error: #dc2626;
+    --dnc-light-bg: #f3f4f6;
+    --dnc-border: #e5e7eb;
+    --dnc-text-dark: #1f2937;
+    --dnc-text-light: #6b7280;
+
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--dnc-text-dark);
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#dietaneo-calculator *,
+#dietaneo-calculator *::before,
+#dietaneo-calculator *::after {
+    box-sizing: border-box;
+}
+
+/* Main card */
+#dietaneo-calculator .dnc-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-bottom: 16px;
+}
+
+/* Section titles */
+#dietaneo-calculator h2 {
+    font-size: 1.4rem;
+    margin-bottom: 24px;
+    color: var(--dnc-text-dark);
+    font-weight: 600;
+}
+
+/* Form groups */
+#dietaneo-calculator .dnc-form-group {
+    margin-bottom: 18px;
+}
+
+#dietaneo-calculator label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--dnc-text-dark);
+}
+
+#dietaneo-calculator input[type="text"],
+#dietaneo-calculator select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--dnc-border);
+    border-radius: 6px;
+    font-size: 1rem;
+    color: var(--dnc-text-dark);
+    background-color: white;
+    transition: border-color 0.2s;
+    margin: 0;
+}
+
+#dietaneo-calculator input[type="text"]:focus,
+#dietaneo-calculator select:focus {
+    outline: none;
+    border-color: var(--dnc-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Buttons */
+#dietaneo-calculator .dnc-btn-primary,
+#dietaneo-calculator .dnc-btn-secondary {
+    display: block;
+    width: 100%;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    margin-top: 8px;
+}
+
+#dietaneo-calculator .dnc-btn-primary {
+    background-color: var(--dnc-primary);
+    color: white;
+}
+
+#dietaneo-calculator .dnc-btn-primary:hover {
+    background-color: var(--dnc-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+#dietaneo-calculator .dnc-btn-primary:active {
+    transform: translateY(0);
+}
+
+#dietaneo-calculator .dnc-btn-secondary {
+    background-color: var(--dnc-light-bg);
+    color: var(--dnc-primary);
+    border: 2px solid var(--dnc-primary);
+    margin-top: 20px;
+}
+
+#dietaneo-calculator .dnc-btn-secondary:hover {
+    background-color: var(--dnc-primary);
+    color: white;
+}
+
+/* Loading */
+#dietaneo-calculator .dnc-loading {
+    text-align: center;
+    padding: 30px;
+    display: none;
+}
+
+#dietaneo-calculator .dnc-loading p {
+    font-size: 1.1rem;
+    color: var(--dnc-text-light);
+    animation: dnc-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dnc-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Error message */
+#dietaneo-calculator .dnc-error-message {
+    background-color: #fee2e2;
+    border: 1px solid var(--dnc-error);
+    border-radius: 6px;
+    padding: 14px;
+    color: var(--dnc-error);
+    margin-bottom: 18px;
+    display: none;
+}
+
+/* Results */
+#dietaneo-calculator .dnc-results {
+    display: none;
+}
+
+#dietaneo-calculator .dnc-result-main {
+    background: linear-gradient(135deg, var(--dnc-primary) 0%, var(--dnc-primary-dark) 100%);
+    color: white;
+    padding: 28px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+#dietaneo-calculator .dnc-result-main .dnc-result-label {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 8px;
+    display: block;
+}
+
+#dietaneo-calculator .dnc-result-main .dnc-result-value {
+    font-size: 3rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    color: white;
+}
+
+#dietaneo-calculator .dnc-result-main .dnc-result-unit {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    display: block;
+}
+
+/* Results grid */
+#dietaneo-calculator .dnc-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+#dietaneo-calculator .dnc-result-item {
+    background-color: var(--dnc-light-bg);
+    padding: 16px;
+    border-radius: 6px;
+    border-left: 4px solid var(--dnc-primary);
+}
+
+#dietaneo-calculator .dnc-result-item .dnc-result-label {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: var(--dnc-text-light);
+    display: block;
+}
+
+#dietaneo-calculator .dnc-result-item .dnc-result-value {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--dnc-primary);
+    display: block;
+}
+
+#dietaneo-calculator .dnc-result-item .dnc-result-unit {
+    font-size: 0.8rem;
+    color: var(--dnc-text-light);
+    display: block;
+    margin-top: 2px;
+}
+
+/* Warning, recommendation, legal notice */
+#dietaneo-calculator .dnc-warning {
+    background-color: #fef3c7;
+    border: 1px solid var(--dnc-warning);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 16px;
+    color: #92400e;
+    display: none;
+}
+
+#dietaneo-calculator .dnc-recommendation {
+    background-color: #f0fdf4;
+    border: 1px solid var(--dnc-success);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 16px;
+    color: #166534;
+}
+
+#dietaneo-calculator .dnc-legal {
+    background-color: var(--dnc-light-bg);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: var(--dnc-text-light);
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+    #dietaneo-calculator .dnc-card {
+        padding: 20px;
+    }
+
+    #dietaneo-calculator .dnc-results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #dietaneo-calculator .dnc-result-main .dnc-result-value {
+        font-size: 2.2rem;
+    }
+}
+</style>
+
+<div id="dietaneo-calculator">
+    <div class="dnc-card">
+        <!-- Form -->
+        <form id="dnc-form">
+            <h2>Tus Datos</h2>
+
+            <div class="dnc-form-group">
+                <label for="dnc-gender">Género:</label>
+                <select id="dnc-gender" name="gender" required>
+                    <option value="">Selecciona...</option>
+                    <option value="H">Hombre</option>
+                    <option value="M">Mujer</option>
+                </select>
+            </div>
+
+            <div class="dnc-form-group">
+                <label for="dnc-weight">Peso (kg):</label>
+                <input type="text" id="dnc-weight" name="weight" placeholder="ej: 75 o 75,5" required>
+            </div>
+
+            <div class="dnc-form-group">
+                <label for="dnc-height">Altura (cm):</label>
+                <input type="text" id="dnc-height" name="height" placeholder="ej: 180" required>
+            </div>
+
+            <div class="dnc-form-group">
+                <label for="dnc-age">Edad (años):</label>
+                <input type="text" id="dnc-age" name="age" placeholder="ej: 30" required>
+            </div>
+
+            <div class="dnc-form-group">
+                <label for="dnc-activity">Nivel de Actividad:</label>
+                <select id="dnc-activity" name="activity" required>
+                    <option value="">Selecciona...</option>
+                    <option value="1">1 - Sedentario (poco o ningún ejercicio)</option>
+                    <option value="2">2 - Ligero (ejercicio 1-3 días/semana)</option>
+                    <option value="3">3 - Moderado (ejercicio 3-5 días/semana)</option>
+                    <option value="4">4 - Intenso (ejercicio 6-7 días/semana)</option>
+                    <option value="5">5 - Muy intenso (ejercicio diario + trabajo físico)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="dnc-btn-primary">Calcular Calorías</button>
+        </form>
+
+        <!-- Loading -->
+        <div id="dnc-loading" class="dnc-loading">
+            <p>Calculando...</p>
+        </div>
+
+        <!-- Error -->
+        <div id="dnc-error" class="dnc-error-message"></div>
+
+        <!-- Results -->
+        <div id="dnc-results" class="dnc-results">
+            <h2>Tus Resultados</h2>
+
+            <div class="dnc-result-main">
+                <span class="dnc-result-label">Calorías Diarias Necesarias</span>
+                <span class="dnc-result-value" id="dnc-total-calories">0</span>
+                <span class="dnc-result-unit">kcal/día</span>
+            </div>
+
+            <div class="dnc-results-grid">
+                <div class="dnc-result-item">
+                    <span class="dnc-result-label">Calorías en Reposo (BMR)</span>
+                    <span class="dnc-result-value" id="dnc-bmr">0</span>
+                    <span class="dnc-result-unit">kcal</span>
+                </div>
+                <div class="dnc-result-item">
+                    <span class="dnc-result-label">Factor de Actividad</span>
+                    <span class="dnc-result-value" id="dnc-activity-factor">0</span>
+                </div>
+                <div class="dnc-result-item">
+                    <span class="dnc-result-label">Reducción por Edad</span>
+                    <span class="dnc-result-value" id="dnc-age-reduction">0</span>
+                    <span class="dnc-result-unit">kcal</span>
+                </div>
+                <div class="dnc-result-item">
+                    <span class="dnc-result-label">Peso Utilizado</span>
+                    <span class="dnc-result-value" id="dnc-used-weight">0</span>
+                    <span class="dnc-result-unit">kg</span>
+                </div>
+            </div>
+
+            <div id="dnc-supplementation" class="dnc-warning"></div>
+
+            <div class="dnc-recommendation">
+                <p id="dnc-recommendation"></p>
+            </div>
+
+            <div class="dnc-legal">
+                <p id="dnc-legal"></p>
+            </div>
+
+            <button type="button" class="dnc-btn-secondary" onclick="dncResetForm()">Calcular Nuevamente</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    // API endpoint (HTTPS for production)
+    const DNC_API_URL = 'https://calculator.dietaneo.com';
+
+    const form = document.getElementById('dnc-form');
+
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const gender   = document.getElementById('dnc-gender').value;
+        const weight   = document.getElementById('dnc-weight').value;
+        const height   = document.getElementById('dnc-height').value;
+        const age      = document.getElementById('dnc-age').value;
+        const activity = document.getElementById('dnc-activity').value;
+
+        // Accept comma as decimal separator (e.g. 75,5 → 75.5)
+        const normalizedWeight = weight.replace(',', '.');
+        const normalizedHeight = height.replace(',', '.');
+        const normalizedAge    = age.replace(',', '.');
+
+        dncShowLoading();
+
+        try {
+            const response = await fetch(DNC_API_URL + '/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sexo:            gender,
+                    peso:            parseFloat(normalizedWeight),
+                    altura:          parseFloat(normalizedHeight),
+                    edad:            parseFloat(normalizedAge),
+                    nivel_actividad: parseInt(activity),
+                }),
+            });
+
+            const data = await response.json();
+            dncHideLoading();
+
+            if (data.status === 'error') {
+                dncShowError(data.message || 'Error desconocido');
+                return;
+            }
+
+            dncDisplayResults(data);
+
+        } catch (error) {
+            dncHideLoading();
+            dncShowError('Error de conexión: ' + error.message);
+        }
+    });
+
+    function dncShowLoading() {
+        document.getElementById('dnc-loading').style.display = 'block';
+        document.getElementById('dnc-error').style.display = 'none';
+        document.getElementById('dnc-results').style.display = 'none';
+    }
+
+    function dncHideLoading() {
+        document.getElementById('dnc-loading').style.display = 'none';
+    }
+
+    function dncShowError(message) {
+        const el = document.getElementById('dnc-error');
+        el.innerHTML = '<strong>Error:</strong> ' + message;
+        el.style.display = 'block';
+        document.getElementById('dnc-results').style.display = 'none';
+    }
+
+    function dncDisplayResults(data) {
+        document.getElementById('dnc-total-calories').textContent =
+            Math.round(data.total_calorias_diarias);
+
+        document.getElementById('dnc-bmr').textContent =
+            Math.round(data.calorias_en_reposo);
+
+        const factor = (data.total_calorias_diarias + data.reduccion_edad) / data.calorias_en_reposo;
+        document.getElementById('dnc-activity-factor').textContent =
+            factor.toFixed(2);
+
+        document.getElementById('dnc-age-reduction').textContent =
+            Math.round(data.reduccion_edad);
+
+        document.getElementById('dnc-used-weight').textContent =
+            data.peso_utilizado_kg.toFixed(1);
+
+        // Supplementation warning
+        const suppEl = document.getElementById('dnc-supplementation');
+        if (data.suplementacion_requerida && data.aviso_suplementacion) {
+            suppEl.textContent = data.aviso_suplementacion;
+            suppEl.style.display = 'block';
+        } else {
+            suppEl.style.display = 'none';
+        }
+
+        if (data.recomendacion) {
+            document.getElementById('dnc-recommendation').textContent = data.recomendacion;
+        }
+
+        if (data.aviso_legal) {
+            document.getElementById('dnc-legal').textContent = data.aviso_legal;
+        }
+
+        document.getElementById('dnc-error').style.display = 'none';
+        document.getElementById('dnc-results').style.display = 'block';
+
+        document.getElementById('dnc-results').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Exposed globally so the "Calcular Nuevamente" button can call it
+    window.dncResetForm = function () {
+        form.reset();
+        document.getElementById('dnc-results').style.display = 'none';
+        document.getElementById('dnc-error').style.display = 'none';
+        form.scrollIntoView({ behavior: 'smooth' });
+    };
+})();
+</script>

@@ -8,12 +8,20 @@ The project follows a modern Python layout to ensure scalability:
 * **`app/`**: Core application directory.
     * **`api.py`**: FastAPI configuration, **custom human-readable error handlers**, and CORS setup.
     * **`calculations.py`**: Core mathematical logic, including **BMI-based weight correction (IMC 24.9)** and age-related metabolism reduction.
+* **`frontend/`**: Web interface (HTML + CSS + JavaScript).
+    * **`index.html`**: Nutrition calculator form and results display.
+    * **`styles.css`**: Responsive styling for desktop and mobile.
+    * **`script.js`**: Client-side logic that communicates with the API.
+* **`test/`**: Unit tests directory (pytest-based).
+* **`docs/`**: Developer documentation.
+    * **`README.md`**: Documentation index for developers.
+    * **`TESTING.md`**: Complete testing guide and best practices.
 * **`docker-compose.yml`**: Orchestration for the Backend (FastAPI) and Cache (Redis) services.
 * **`Dockerfile`**: Container recipe for the Python environment.
 * **`.env`**: Environment variables (secrets and configuration).
 * **`test.http`**: Configuration for rapid API testing within VS Code.
 * **`requirements.txt`**: Project dependencies.
-* **`.ruff.toml`**: Configuration for the **Ruff** linter (code quality).
+* **`CLAUDE.md`**: Architecture and development guidelines.
 
 ## 🚀 Professional Features
 * **Humanized Validation**: Custom error handling that accepts both dots and commas (`,`, `.`) for decimal inputs, providing clear Spanish messages for the frontend.
@@ -28,7 +36,7 @@ The project follows a modern Python layout to ensure scalability:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/Rosa-1015/dietaneo-calculator.git](https://github.com/Rosa-1015/dietaneo-calculator.git)
+    git clone https://github.com/Rosa-1015/dietaneo-caloric-calculator.git
     cd dietaneo-calculator
     ```
 
@@ -46,12 +54,67 @@ The project follows a modern Python layout to ensure scalability:
     python -m uvicorn app.api:app --reload --port 8001
     ```
 
-## 🔍 Code Quality & Testing
+## 🌍 Frontend Setup
+
+The frontend is a standalone web application that works with the backend API:
+
+1. **Start the backend** (API must be running on `http://localhost:8001`):
+    ```bash
+    docker compose up --build
+    ```
+
+2. **Open the frontend**:
+    ```bash
+    cd frontend
+    # Then open index.html in your browser (or drag & drop the file)
+    ```
+
+3. **Use the calculator**:
+    - Fill in your personal data (gender, weight, height, age, activity level)
+    - Click "Calcular Calorías" (Calculate Calories)
+    - View your daily caloric needs
+
+**Note**: The frontend can be integrated into WordPress or deployed as a standalone website. See [Frontend Integration Guide](docs/FRONTEND_INTEGRATION.md) for more details.
+
+## 🧪 Running Tests
+
+Run the complete test suite with:
+
+```bash
+pytest
+```
+
+View code coverage:
+
+```bash
+pytest --cov=app --cov-report=term-missing
+```
+
+**Current Test Status:**
+- **35 tests** passing (8 API integration + 27 calculation unit tests)
+- **87% code coverage** on active code
+- **Automated CI/CD** via GitHub Actions - tests run on every push
+
+For detailed testing documentation, see [Testing Guide](docs/TESTS_README.md).
+
+## 🔍 Code Quality
+
 Before pushing changes, ensure the code follows style guidelines:
 
-```powershell
+```bash
 python -m ruff check .
 ```
+
+## 👨‍💻 For Developers
+
+For detailed guides on testing, architecture, and development workflows, see the [Developer Documentation](docs/README.md).
+
+Quick links:
+- **[Frontend Integration Guide](docs/FRONTEND_INTEGRATION.md)** - How to integrate with WordPress or deploy standalone
+- **[Test Suite Guide](docs/TESTS_README.md)** - How to run, write, and understand tests
+- **[Testing Mentor Guide](docs/TESTING.md)** - Complete learning guide (pytest, FastAPI)
+- **[CLAUDE.md](CLAUDE.md)** - Architecture & development setup
+- **[API Documentation](#-api-documentation)** - Endpoint details below
 
 ## 🌐 API Documentation
 
@@ -66,7 +129,7 @@ This project is designed to be deployed on cloud environments (such as Hetzner/A
 
 **Workflow:** Test locally → `git push` → `ssh` to server → `git pull`
 
-Ejecuta el siguiente comando para actualizar el servicio:
+Run the following command to update the service:
 
 ```bash
 docker compose up --build -d

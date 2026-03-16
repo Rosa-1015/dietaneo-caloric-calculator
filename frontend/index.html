@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dietaneo - Calculadora de Calorías</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dietaneo</h1>
+            <p class="subtitle">Calculadora de Necesidades Calóricas Diarias</p>
+        </header>
+
+        <main>
+            <form id="calorieForm" class="form-section">
+                <h2>Tus Datos</h2>
+
+                <div class="form-group">
+                    <label for="gender">Género:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Selecciona...</option>
+                        <option value="H">Hombre</option>
+                        <option value="M">Mujer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Peso (kg):</label>
+                    <input type="text" id="weight" name="weight" placeholder="ej: 75 o 75,5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Altura (cm):</label>
+                    <input type="text" id="height" name="height" placeholder="ej: 180" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Edad (años):</label>
+                    <input type="text" id="age" name="age" placeholder="ej: 30" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">Nivel de Actividad:</label>
+                    <select id="activity" name="activity" required>
+                        <option value="">Selecciona...</option>
+                        <option value="1">1 - Sedentario (poco ejercicio)</option>
+                        <option value="2">2 - Ligero (ejercicio 1-3 días/semana)</option>
+                        <option value="3">3 - Moderado (ejercicio 3-5 días/semana)</option>
+                        <option value="4">4 - Intenso (ejercicio 6-7 días/semana)</option>
+                        <option value="5">5 - Muy intenso (ejercicio diario + deportes)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Calcular Calorías</button>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <p>Calculando...</p>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <div id="results" class="results-section" style="display: none;">
+                <h2>Tus Resultados</h2>
+
+                <div class="result-main">
+                    <p class="result-label">Calorías Diarias Necesarias:</p>
+                    <p class="result-value" id="totalCalories">0</p>
+                    <p class="result-unit">kcal/día</p>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-item">
+                        <span class="result-label">Calorías en Reposo (BMR):</span>
+                        <span class="result-value" id="bmr">0</span>
+                        <span class="result-unit">kcal</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">Factor de Actividad:</span>
+                        <span class="result-value" id="activityFactor">0</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">Reducción por Edad:</span>
+                        <span class="result-value" id="ageReduction">0</span>
+                        <span class="result-unit">kcal</span>
+                    </div>
+
+                    <div class="result-item">
+                        <span class="result-label">Peso Utilizado:</span>
+                        <span class="result-value" id="usedWeight">0</span>
+                        <span class="result-unit">kg</span>
+                    </div>
+                </div>
+
+                <div id="supplementationWarning" class="warning" style="display: none;">
+                    <p id="supplementationText"></p>
+                </div>
+
+                <div class="recommendation">
+                    <p id="recommendationText"></p>
+                </div>
+
+                <div class="legal-notice">
+                    <p id="legalText"></p>
+                </div>
+
+                <button type="button" class="btn-secondary" onclick="resetForm()">Calcular Nuevamente</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 Dietaneo. Basado en la fórmula de Harris-Benedict.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
