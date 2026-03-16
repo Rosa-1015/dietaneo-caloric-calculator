@@ -172,13 +172,13 @@ def test_calculate_invalid_activity_level():
     assert "1, 2, 3, 4 o 5" in data["message"]
 
 
-def test_calculate_negative_weight():
-    """Test POST /calculate - Peso negativo (esperamos error)"""
+def test_calculate_weight_out_of_range():
+    """Test POST /calculate - Peso fuera del rango válido (30-300 kg)"""
 
-    # ARRANGE - Peso negativo (inválido)
+    # ARRANGE - Peso absurdo
     payload = {
         "sexo": "H",
-        "peso": -80,             # ❌ Negativo
+        "peso": 10000,           # ❌ Imposible
         "altura": 180,
         "edad": 35,
         "nivel_actividad": 3
@@ -188,18 +188,36 @@ def test_calculate_negative_weight():
     response = client.post("/calculate", json=payload)
 
     # ASSERT
-    # 1. Status code
     assert response.status_code == 200
-
-    # 2. Indica error
     data = response.json()
     assert data["status"] == "error"
+    assert data["encabezado"] == "PESO NO VÁLIDO"
+    assert "30" in data["message"]
+    assert "300" in data["message"]
 
-    # 3. Encabezado específico para peso
-    assert data["encabezado"] == "PESO INVÁLIDO"
 
-    # 4. Mensaje menciona peso
-    assert "peso" in data["message"]
+def test_calculate_height_out_of_range():
+    """Test POST /calculate - Altura fuera del rango válido (50-250 cm)"""
+
+    # ARRANGE - Altura imposible
+    payload = {
+        "sexo": "H",
+        "peso": 80,
+        "altura": 10,            # ❌ Imposible
+        "edad": 35,
+        "nivel_actividad": 3
+    }
+
+    # ACT
+    response = client.post("/calculate", json=payload)
+
+    # ASSERT
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "error"
+    assert data["encabezado"] == "ALTURA NO VÁLIDA"
+    assert "50" in data["message"]
+    assert "250" in data["message"]
 
 
 def test_calculate_comma_decimal():
