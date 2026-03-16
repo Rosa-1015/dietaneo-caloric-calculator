@@ -104,11 +104,18 @@ def calculate(data: NutritionData):
             "message": "El nivel de actividad debe ser exactamente 1, 2, 3, 4 o 5."
         }
 
-    if peso_v <= 0:
+    if peso_v < 30 or peso_v > 300:
         return {
             "status": "error",
-            "encabezado": "PESO INVÁLIDO",
-            "message": "El peso debe ser un valor positivo mayor a cero."
+            "encabezado": "PESO NO VÁLIDO",
+            "message": "El peso debe estar entre 30 y 300 kg."
+        }
+
+    if altura_v < 50 or altura_v > 250:
+        return {
+            "status": "error",
+            "encabezado": "ALTURA NO VÁLIDA",
+            "message": "La altura debe estar entre 50 y 250 cm."
         }
 
     effective_weight = get_adjusted_weight(peso_v, altura_v)
