@@ -14,11 +14,9 @@
         </header>
 
         <main>
-            <!-- Input form -->
             <form id="calorieForm" class="form-section">
                 <h2>Tus Datos</h2>
 
-                <!-- Gender -->
                 <div class="form-group">
                     <label for="gender">Género:</label>
                     <select id="gender" name="gender" required>
@@ -28,25 +26,21 @@
                     </select>
                 </div>
 
-                <!-- Weight -->
                 <div class="form-group">
                     <label for="weight">Peso (kg):</label>
                     <input type="text" id="weight" name="weight" placeholder="ej: 75 o 75,5" required>
                 </div>
 
-                <!-- Height -->
                 <div class="form-group">
                     <label for="height">Altura (cm):</label>
                     <input type="text" id="height" name="height" placeholder="ej: 180" required>
                 </div>
 
-                <!-- Age -->
                 <div class="form-group">
                     <label for="age">Edad (años):</label>
                     <input type="text" id="age" name="age" placeholder="ej: 30" required>
                 </div>
 
-                <!-- Activity level -->
                 <div class="form-group">
                     <label for="activity">Nivel de Actividad:</label>
                     <select id="activity" name="activity" required>
@@ -62,15 +56,12 @@
                 <button type="submit" class="btn-primary">Calcular Calorías</button>
             </form>
 
-            <!-- Loading indicator -->
             <div id="loading" class="loading" style="display: none;">
                 <p>Calculando...</p>
             </div>
 
-            <!-- Error message area -->
             <div id="errorMessage" class="error-message" style="display: none;"></div>
 
-            <!-- Results section -->
             <div id="results" class="results-section" style="display: none;">
                 <h2>Tus Resultados</h2>
 
@@ -105,17 +96,14 @@
                     </div>
                 </div>
 
-                <!-- Supplementation warning -->
                 <div id="supplementationWarning" class="warning" style="display: none;">
                     <p id="supplementationText"></p>
                 </div>
 
-                <!-- Professional recommendation -->
                 <div class="recommendation">
                     <p id="recommendationText"></p>
                 </div>
 
-                <!-- Legal notice -->
                 <div class="legal-notice">
                     <p id="legalText"></p>
                 </div>

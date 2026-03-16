@@ -36,7 +36,7 @@ The project follows a modern Python layout to ensure scalability:
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/Rosa-1015/dietaneo-calculator.git](https://github.com/Rosa-1015/dietaneo-calculator.git)
+    git clone https://github.com/Rosa-1015/dietaneo-caloric-calculator.git
     cd dietaneo-calculator
     ```
 
@@ -129,7 +129,7 @@ This project is designed to be deployed on cloud environments (such as Hetzner/A
 
 **Workflow:** Test locally → `git push` → `ssh` to server → `git pull`
 
-Ejecuta el siguiente comando para actualizar el servicio:
+Run the following command to update the service:
 
 ```bash
 docker compose up --build -d
