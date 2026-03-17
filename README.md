@@ -1,5 +1,13 @@
 # 🍎 Dietaneo Caloric Calculator (Pro Version)
 
+![Status](https://img.shields.io/badge/status-live%20in%20production-brightgreen)
+![Python](https://img.shields.io/badge/python-3.13-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.128-green)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
+
+> **Live at** → [https://calculator.dietaneo.com](https://calculator.dietaneo.com)
+> **API docs** → [https://calculator.dietaneo.com/docs](https://calculator.dietaneo.com/docs)
+
 A professional-grade caloric needs calculator based on the **Harris-Benedict formula**, refactored to follow **modular programming** principles and clean architecture. Now fully **Dockerized** with **Redis** caching and advanced clinical validation logic.
 
 ## 📂 Project Structure
