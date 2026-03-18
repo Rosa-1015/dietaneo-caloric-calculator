@@ -358,6 +358,8 @@
 
             <div id="dnc-supplementation" class="dnc-warning"></div>
 
+            <div id="dnc-minimum-calorie" class="dnc-warning"></div>
+
             <div class="dnc-recommendation">
                 <p id="dnc-recommendation"></p>
             </div>
@@ -464,6 +466,15 @@
             suppEl.style.display = 'block';
         } else {
             suppEl.style.display = 'none';
+        }
+
+        // Minimum calorie warning
+        const minCalEl = document.getElementById('dnc-minimum-calorie');
+        if (data.aviso_minimo_calorico) {
+            minCalEl.textContent = data.aviso_minimo_calorico;
+            minCalEl.style.display = 'block';
+        } else {
+            minCalEl.style.display = 'none';
         }
 
         if (data.recomendacion) {
