@@ -92,6 +92,15 @@ function displayResults(data) {
         supplementationWarning.style.display = 'none';
     }
 
+    const minimumCalorieWarning = document.getElementById('minimumCalorieWarning');
+    if (data.aviso_minimo_calorico) {
+        document.getElementById('minimumCalorieText').textContent =
+            data.aviso_minimo_calorico;
+        minimumCalorieWarning.style.display = 'block';
+    } else {
+        minimumCalorieWarning.style.display = 'none';
+    }
+
     if (data.recomendacion) {
         document.getElementById('recommendationText').textContent =
             data.recomendacion;
