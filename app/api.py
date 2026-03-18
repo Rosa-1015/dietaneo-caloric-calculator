@@ -132,6 +132,10 @@ def calculate(data: NutritionData):
     if needs_supplementation:
         supplement_warning = "Nota: Al ser una pauta hipocalórica con ajuste metabólico por debajo de 1800 kcal, se recomienda valorar suplementación de micronutrientes."
 
+    minimum_calorie_warning = ""
+    if tdee < 1200:
+        minimum_calorie_warning = "Se recomienda un aporte mínimo de 1200 kcal/día y valorar suplementación nutricional con un profesional de la salud."
+
     return {
             "encabezado": "RESULTADO PARA DIETANEO",
             "peso_utilizado_kg": round(effective_weight, 2),
@@ -141,6 +145,7 @@ def calculate(data: NutritionData):
             "total_calorias_diarias": round(tdee, 2),
             "suplementacion_requerida": needs_supplementation,
             "aviso_suplementacion": supplement_warning,
+            "aviso_minimo_calorico": minimum_calorie_warning,
             "aviso_legal": "Esta estimación es orientativa y no sustituye la valoración profesional.",
             "recomendacion": "Para personalizar tu plan, consulta con un dietista.",
             "status": "success"
