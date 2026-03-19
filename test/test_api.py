@@ -196,3 +196,56 @@ def test_minimum_calorie_warning():
     assert data["total_calorias_diarias"] < 1200
     assert "aviso_minimo_calorico" in data
     assert "1200" in data["aviso_minimo_calorico"]
+
+
+def test_obesity_below_1200_shows_only_minimum_calorie_warning():
+    """Test POST /calculate - Cuando hay obesidad Y TDEE < 1200 kcal,
+    solo debe aparecer el aviso de mínimo calórico (1200 kcal),
+    no el aviso de suplementación por obesidad (1800 kcal).
+
+    Mismo caso: mujer, 77 años, sedentaria, 83 kg, 154 cm.
+    """
+    payload = {
+        "sexo": "M",
+        "peso": 83,
+        "altura": 154,
+        "edad": 77,
+        "nivel_actividad": 1
+    }
+
+    response = client.post("/calculate", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["total_calorias_diarias"] < 1200
+    assert "1200" in data["aviso_minimo_calorico"]
+    assert data["suplementacion_requerida"] is False
+    assert data["aviso_suplementacion"] == ""
+
+
+def test_obesity_between_1200_and_1800_shows_supplementation_warning():
+    """Test POST /calculate - Cuando hay obesidad Y el TDEE está entre 1200 y 1800 kcal,
+    debe aparecer el aviso de suplementación (1800 kcal) pero NO el de mínimo calórico.
+
+    Caso: mujer, 65 años, sedentaria, 90 kg, 160 cm.
+    Tiene obesidad (BMI ~35) → se aplica peso corregido.
+    La reducción por edad + sedentarismo deja el TDEE por encima de 1200 pero por debajo de 1800.
+    """
+    payload = {
+        "sexo": "M",
+        "peso": 90,
+        "altura": 160,
+        "edad": 65,
+        "nivel_actividad": 1
+    }
+
+    response = client.post("/calculate", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert 1200 <= data["total_calorias_diarias"] < 1800
+    assert data["suplementacion_requerida"] is True
+    assert "1800" in data["aviso_suplementacion"]
+    assert data["aviso_minimo_calorico"] == ""
