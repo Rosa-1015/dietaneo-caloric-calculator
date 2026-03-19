@@ -126,15 +126,15 @@ def calculate(data: NutritionData):
     tdee = calculate_tdee(bmr, factor_final, reduction)
 
     is_weight_corrected = effective_weight < peso_v
-    needs_supplementation = is_weight_corrected and tdee < 1800
+    minimum_calorie_warning = ""
+    if tdee < 1200:
+        minimum_calorie_warning = "Se recomienda un aporte mínimo de 1200 kcal/día y valorar suplementación nutricional con un profesional de la salud."
+
+    needs_supplementation = is_weight_corrected and tdee < 1800 and tdee >= 1200
 
     supplement_warning = ""
     if needs_supplementation:
         supplement_warning = "Nota: Al ser una pauta hipocalórica con ajuste metabólico por debajo de 1800 kcal, se recomienda valorar suplementación de micronutrientes."
-
-    minimum_calorie_warning = ""
-    if tdee < 1200:
-        minimum_calorie_warning = "Se recomienda un aporte mínimo de 1200 kcal/día y valorar suplementación nutricional con un profesional de la salud."
 
     return {
             "encabezado": "RESULTADO PARA DIETANEO",
