@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: nutrition-calculator-api
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8001:8001"
     env_file:
@@ -20,6 +21,7 @@ services:
   nutrition-redis:
     image: redis:alpine
     container_name: nutrition-calculator-redis
+    restart: unless-stopped
     networks:
       - nutrition-network
 
